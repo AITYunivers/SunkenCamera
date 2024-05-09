@@ -1,0 +1,133 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34825.169
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SunkenCamera.Windows", "SunkenCamera.Windows.vcxproj", "{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SunkenCamera.Shared", "SunkenCamera.Shared.vcxitems", "{633109E6-84FE-4B06-B91B-994BC389AD34}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug Unicode|ARM = Debug Unicode|ARM
+		Debug Unicode|ARM64 = Debug Unicode|ARM64
+		Debug Unicode|Win32 = Debug Unicode|Win32
+		Debug Unicode|x64 = Debug Unicode|x64
+		Debug|ARM = Debug|ARM
+		Debug|ARM64 = Debug|ARM64
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Edittime French|ARM = Edittime French|ARM
+		Edittime French|ARM64 = Edittime French|ARM64
+		Edittime French|Win32 = Edittime French|Win32
+		Edittime French|x64 = Edittime French|x64
+		Edittime Unicode|ARM = Edittime Unicode|ARM
+		Edittime Unicode|ARM64 = Edittime Unicode|ARM64
+		Edittime Unicode|Win32 = Edittime Unicode|Win32
+		Edittime Unicode|x64 = Edittime Unicode|x64
+		Edittime|ARM = Edittime|ARM
+		Edittime|ARM64 = Edittime|ARM64
+		Edittime|Win32 = Edittime|Win32
+		Edittime|x64 = Edittime|x64
+		Runtime French|ARM = Runtime French|ARM
+		Runtime French|ARM64 = Runtime French|ARM64
+		Runtime French|Win32 = Runtime French|Win32
+		Runtime French|x64 = Runtime French|x64
+		Runtime Unicode|ARM = Runtime Unicode|ARM
+		Runtime Unicode|ARM64 = Runtime Unicode|ARM64
+		Runtime Unicode|Win32 = Runtime Unicode|Win32
+		Runtime Unicode|x64 = Runtime Unicode|x64
+		Runtime|ARM = Runtime|ARM
+		Runtime|ARM64 = Runtime|ARM64
+		Runtime|Win32 = Runtime|Win32
+		Runtime|x64 = Runtime|x64
+		Vitalize|ARM = Vitalize|ARM
+		Vitalize|ARM64 = Vitalize|ARM64
+		Vitalize|Win32 = Vitalize|Win32
+		Vitalize|x64 = Vitalize|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug Unicode|ARM.ActiveCfg = Debug Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug Unicode|ARM.Build.0 = Debug Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug Unicode|ARM64.ActiveCfg = Debug Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug Unicode|ARM64.Build.0 = Debug Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug Unicode|Win32.ActiveCfg = Debug Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug Unicode|Win32.Build.0 = Debug Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug Unicode|x64.ActiveCfg = Debug Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug Unicode|x64.Build.0 = Debug Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug|ARM.ActiveCfg = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug|ARM.Build.0 = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug|ARM64.Build.0 = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug|Win32.Build.0 = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug|x64.ActiveCfg = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Debug|x64.Build.0 = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime French|ARM.ActiveCfg = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime French|ARM.Build.0 = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime French|ARM64.ActiveCfg = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime French|ARM64.Build.0 = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime French|Win32.ActiveCfg = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime French|Win32.Build.0 = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime French|x64.ActiveCfg = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime French|x64.Build.0 = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime Unicode|ARM.ActiveCfg = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime Unicode|ARM.Build.0 = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime Unicode|ARM64.ActiveCfg = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime Unicode|ARM64.Build.0 = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime Unicode|Win32.ActiveCfg = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime Unicode|Win32.Build.0 = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime Unicode|x64.ActiveCfg = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime Unicode|x64.Build.0 = Edittime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime|ARM.ActiveCfg = Edittime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime|ARM.Build.0 = Edittime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime|ARM64.ActiveCfg = Edittime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime|ARM64.Build.0 = Edittime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime|Win32.ActiveCfg = Edittime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime|Win32.Build.0 = Edittime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime|x64.ActiveCfg = Edittime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Edittime|x64.Build.0 = Edittime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime French|ARM.ActiveCfg = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime French|ARM.Build.0 = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime French|ARM64.ActiveCfg = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime French|ARM64.Build.0 = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime French|Win32.ActiveCfg = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime French|Win32.Build.0 = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime French|x64.ActiveCfg = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime French|x64.Build.0 = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime Unicode|ARM.ActiveCfg = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime Unicode|ARM.Build.0 = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime Unicode|ARM64.ActiveCfg = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime Unicode|ARM64.Build.0 = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime Unicode|Win32.ActiveCfg = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime Unicode|Win32.Build.0 = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime Unicode|x64.ActiveCfg = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime Unicode|x64.Build.0 = Runtime Unicode|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime|ARM.ActiveCfg = Runtime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime|ARM.Build.0 = Runtime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime|ARM64.ActiveCfg = Runtime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime|ARM64.Build.0 = Runtime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime|Win32.ActiveCfg = Runtime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime|Win32.Build.0 = Runtime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime|x64.ActiveCfg = Runtime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Runtime|x64.Build.0 = Runtime|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Vitalize|ARM.ActiveCfg = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Vitalize|ARM.Build.0 = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Vitalize|ARM64.ActiveCfg = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Vitalize|ARM64.Build.0 = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Vitalize|Win32.ActiveCfg = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Vitalize|Win32.Build.0 = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Vitalize|x64.ActiveCfg = Debug|Win32
+		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Vitalize|x64.Build.0 = Debug|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {45C892FB-FEE7-4CAA-B5CA-CAB83E06D99B}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SunkenCamera.Shared.vcxitems*{29c98f64-7cc6-4aca-9f50-fe5f99fca85d}*SharedItemsImports = 4
+		SunkenCamera.Shared.vcxitems*{633109e6-84fe-4b06-b91b-994bc389ad34}*SharedItemsImports = 9
+	EndGlobalSection
+EndGlobal

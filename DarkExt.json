@@ -1,0 +1,218 @@
+{
+	"Identifier": "SYCm",
+	"Dependencies": "",
+	"UK English": {
+		"About": {
+			"Name": "Sunken Camera",
+			"Author": "Sunken Studios and Yunivers",
+			"Copyright": "Copyright \u00A9 2024 Yunivers",
+			"Comment": "Version 1.0.3"
+		},
+		"ActionMenu": [
+			[ 0, "Set Divisor" ],
+			[ 1, "Set Margin" ],
+			[ 2, "Set Factor" ],
+			"---",
+			[ 3, "Allow/Disallow Scrolling"],
+			[ 8, "Set Center Display"],
+			[ 4, "Set Easing"],
+			[ 5, "Set Horizontal Scrolling"],
+			[ 6, "Set Vertical Scrolling"],
+			[ 7, "Set Peytonphile Scrolling"]
+		],
+		"ConditionMenu": [
+			[ 0, "Scrolling is disallowed" ],
+			[ 5, "Center Display is enabled" ],
+			[ 1, "Easing is enabled" ],
+			[ 2, "Horizontal Scrolling is enabled" ],
+			[ 3, "Vertical Scrolling is enabled" ],
+			[ 4, "Peytonphile Scrolling is enabled" ]
+		],
+		"ExpressionMenu": [
+			[ 0, "Get Divisor" ],
+			[ 1, "Get Margin" ],
+			[ 2, "Get Factor" ],
+			"---",
+			[ 3, "Get Scroll X" ],
+			[ 4, "Get Scroll Y" ],
+			[ 5, "Get Scroll Target X" ],
+			[ 6, "Get Scroll Target Y" ],
+			[ 7, "Get X Speed" ],
+			[ 8, "Get Y Speed" ]
+		],
+		"Actions": [
+			{
+				"Title": "Set Divisor to %0",
+				"Parameters": [
+					[ "Float", "Enter value (Minimum: 0)" ]
+				]
+			},
+			{
+				"Title": "Set Margin to %0",
+				"Parameters": [
+					[ "Float", "Enter value (Minimum: 0)" ]
+				]
+			},
+			{
+				"Title": "Set Factor to %0",
+				"Parameters": [
+					[ "Float", "Enter value (Minimum: 0, Maximum: 100)" ]
+				]
+			},
+			{
+				"Title": "Set Disallow Scrolling to %0",
+				"Parameters": [
+					[ "Integer", "Enter value (0 = ALLOW, otherwise DISALLOW)" ]
+				]
+			},
+			{
+				"Title": "Set Easing to %0",
+				"Parameters": [
+					[ "Integer", "Enter value (0 = OFF, otherwise ON)" ]
+				]
+			},
+			{
+				"Title": "Set Horizontal Scrolling to %0",
+				"Parameters": [
+					[ "Integer", "Enter value (0 = OFF, otherwise ON)" ]
+				]
+			},
+			{
+				"Title": "Set Vertical Scrolling to %0",
+				"Parameters": [
+					[ "Integer", "Enter value (0 = OFF, otherwise ON)" ]
+				]
+			},
+			{
+				"Title": "Set Peytonphile Scrolling to %0",
+				"Parameters": [
+					[ "Integer", "Enter value (0 = OFF, otherwise ON)" ]
+				]
+			},
+			{
+				"Title": "Set Center Display to %0",
+				"Parameters": [
+					[ "Integer", "Enter value (0 = OFF, otherwise ON)" ]
+				]
+			}
+		],
+		"Conditions": [
+			{
+				"Title": "%o : Is Scrolling Disallowed?",
+				"Triggered": false
+			},
+			{
+				"Title": "%o : Is Easing Enabled?",
+				"Triggered": false
+			},
+			{
+				"Title": "%o : Is Horizontal Scrolling Enabled?",
+				"Triggered": false
+			},
+			{
+				"Title": "%o : Is Vertical Scrolling Enabled?",
+				"Triggered": false
+			},
+			{
+				"Title": "%o : Is Peytonphile scrolling Enabled?",
+				"Triggered": false
+			},
+			{
+				"Title": "%o : Is Center Display Enabled?",
+				"Triggered": false
+			}
+		],
+		"Expressions": [
+			{
+				"Title": "Divisor(",
+				"Returns": "Float"
+			},
+			{
+				"Title": "Margin(",
+				"Returns": "Float"
+			},
+			{
+				"Title": "Factor(",
+				"Returns": "Float"
+			},
+			{
+				"Title": "XScroll(",
+				"Returns": "Float"
+			},
+			{
+				"Title": "YScroll(",
+				"Returns": "Float"
+			},
+			{
+				"Title": "XScrollTarget(",
+				"Returns": "Float"
+			},
+			{
+				"Title": "YScrollTarget(",
+				"Returns": "Float"
+			},
+			{
+				"Title": "XSpeed(",
+				"Returns": "Float"
+			},
+			{
+				"Title": "YSpeed(",
+				"Returns": "Float"
+			}
+		],
+		"Properties": [
+			{
+				"Title": "Divisor",
+				"Info": "Divides the speed based on how far cursor is from deadzone",
+				"Type": "Editbox Number",
+				"DefaultState": 23,
+				"Minimum": 0
+			},
+			{
+				"Title": "Margin",
+				"Info": "The deadzone",
+				"Type": "Editbox Number",
+				"DefaultState": 200,
+				"Minimum": 0
+			},
+			{
+				"Title": "Factor",
+				"Info": "Speed of the easing",
+				"Type": "Editbox Number",
+				"DefaultState": 10,
+				"Minimum": 0,
+				"Maximum": 100
+			},
+			{
+				"Title": "Auto Center Display",
+				"Info": "Automatically centers the frame to the camera.",
+				"Type": "Checkbox",
+				"DefaultState": true
+			},
+			{
+				"Title": "Easing",
+				"Info": "Whether or not to ease the scrolling.",
+				"Type": "Checkbox",
+				"DefaultState": true
+			},
+			{
+				"Title": "Horizontal Scrolling",
+				"Info": "Whether or not to calculate the scrolling horizontally.",
+				"Type": "Checkbox",
+				"DefaultState": true
+			},
+			{
+				"Title": "Vertical Scrolling",
+				"Info": "Whether or not to calculate the scrolling vertically.",
+				"Type": "Checkbox",
+				"DefaultState": false
+			},
+			{
+				"Title": "Peytonphile Scrolling",
+				"Info": "Frame centered based on your cursor position scaled to the frame size.",
+				"Type": "Checkbox",
+				"DefaultState": false
+			}
+		]
+	}
+}
