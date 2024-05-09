@@ -146,7 +146,7 @@ globalThis['darkEdif'] = (globalThis['darkEdif'] && globalThis['darkEdif'].sdkVe
 			throw "Property " + prop.propName + " is not textual.";
 		};
 		this['GetPropertyNum'] = function(chkIDOrName) {
-			const idx = that.GetPropertyIndex(chkIDOrName);
+			const idx = GetPropertyIndex(chkIDOrName);
 			if (idx == -1) {
 				return 0.0;
 			}
@@ -163,10 +163,10 @@ globalThis['darkEdif'] = (globalThis['darkEdif'] && globalThis['darkEdif'].sdkVe
 				27 // PROPTYPE_SPINEDITFLOAT
 			];
 			if (numPropIDsInteger.indexOf(prop.propTypeID) != -1) {
-				return new DataView(prop.propData).getUint32(0, true);
+				return new DataView(prop.propData.buffer).getUint32(0, true);
 			}
 			if (numPropIDsFloat.indexOf(prop.propTypeID) != -1) {
-				return new DataView(prop.propData).getFloat32(0, true);
+				return new DataView(prop.propData.buffer).getFloat32(0, true);
 			}
 			throw "Property " + prop.propName + " is not numeric.";
 		};
@@ -205,7 +205,7 @@ globalThis['darkEdif'] = (globalThis['darkEdif'] && globalThis['darkEdif'].sdkVe
 })();
 
 /** @constructor */
-function CRunDarkEdif_Template() {
+function CRunSunkenCamera() {
 	/// <summary> Constructor of Fusion object. </summary>
 
 	// DarkEdif SDK exts should have these four variables defined.
@@ -224,29 +224,86 @@ function CRunDarkEdif_Template() {
 	// ======================================================================================================
 	// Actions
 	// ======================================================================================================
-	this.Action_ActionExample = function (ExampleParameter) {
-		// nothing, as C++ does nothing
+	this.Action_SetDivisor = function (divisor) {
+		this.Divisor = divisor;
 	};
-	this.Action_SecondActionExample = function () {
-		// nothing, as C++ does nothing
+	this.Action_SetMargin = function (margin) {
+		this.Margin = margin;
+	};
+	this.Action_SetFactor = function (factor) {
+		this.Factor = this.Clamp(factor, 0, 100);
+	};
+	this.Action_SetDisallowScrolling = function (setting) {
+		this._dontScroll = setting != 0;
+	};
+	this.Action_SetCenterDisplay = function (setting) {
+		this.CenterDisplay = setting != 0;
+	};
+	this.Action_SetHoriScrolling = function (setting) {
+		this.HoriScrolling = setting != 0;
+	};
+	this.Action_SetVertScrolling = function (setting) {
+		this.VertScrolling = setting != 0;
+	};
+	this.Action_SetEasing = function (setting) {
+		this.Easing = setting != 0;
+	};
+	this.Action_SetPeytonphile = function (setting) {
+		this.Peytonphile = setting != 0;
 	};
 
 	// ======================================================================================================
 	// Conditions
 	// ======================================================================================================
-	this.Condition_AreTwoNumbersEqual = function (First, Second) {
-		return First == Second;
+	this.Condition_CheckDisallowScrolling = function () {
+		return _dontScroll;
+	};
+	this.Condition_CheckCenterDisplay = function () {
+		return CenterDisplay;
+	};
+	this.Condition_CheckEasing = function () {
+		return Easing;
+	};
+	this.Condition_CheckHoriScrolling = function () {
+		return HoriScrolling;
+	};
+	this.Condition_CheckVertScrolling = function () {
+		return VertScrolling;
+	};
+	this.Condition_CheckPeytonphile = function () {
+		return Peytonphile;
 	};
 
 	// =============================
 	// Expressions
 	// =============================
 
-	this.Expression_Add = function (First, Second) {
-		return First + Second;
+	this.Expression_GetDivisor = function () {
+		return Divisor;
 	};
-	this.Expression_HelloWorld = function () {
-		return "Hello world!";
+	this.Expression_GetMargin = function () {
+		return Margin;
+	};
+	this.Expression_GetFactor = function () {
+		return Factor;
+	};
+	this.Expression_GetXScroll = function () {
+		return _scrollingX;
+	};
+	this.Expression_GetYScroll = function () {
+		return _scrollingY;
+	};
+	this.Expression_GetXScrollTarget = function () {
+		return _scrollingXTarget;
+	};
+	this.Expression_GetYScrollTarget = function () {
+		return _scrollingYTarget;
+	};
+	this.Expression_GetXSpeed = function () {
+		return _xSpeed;
+	};
+	this.Expression_GetYSpeed = function () {
+		return _ySpeed;
 	};
 
 	// =============================
@@ -254,21 +311,42 @@ function CRunDarkEdif_Template() {
 	// =============================
 
 	this.$actionFuncs = [
-	/* 0 */ this.Action_ActionExample,
-	/* 1 */ this.Action_SecondActionExample
-	];
-	this.$conditionFuncs = [
-	/* 0 */ this.Condition_AreTwoNumbersEqual
+	/* 0 */ this.Action_SetDivisor,
+	/* 1 */ this.Action_SetMargin,
+	/* 2 */ this.Action_SetFactor,
 
-	// update getNumOfConditions function if you edit this!!!!
+	/* 3 */ this.Action_SetDisallowScrolling,
+	/* 4 */ this.Action_SetEasing,
+	/* 5 */ this.Action_SetHoriScrolling,
+	/* 6 */ this.Action_SetVertScrolling,
+	/* 7 */ this.Action_SetPeytonphile,
+	/* 8 */ this.Action_SetCenterDisplay
 	];
+
+	this.$conditionFuncs = [
+	/* 0 */ this.Condition_CheckDisallowScrolling,
+	/* 1 */ this.Condition_CheckEasing,
+	/* 2 */ this.Condition_CheckHoriScrolling,
+	/* 3 */ this.Condition_CheckVertScrolling,
+	/* 4 */ this.Condition_CheckPeytonphile,
+	/* 5 */ this.Condition_CheckCenterDisplay
+	];
+
 	this.$expressionFuncs = [
-	/* 0 */ this.Expression_Add,
-	/* 1 */ this.Expression_HelloWorld
+	/* 0 */ this.Expression_GetDivisor,
+	/* 1 */ this.Expression_GetMargin,
+	/* 2 */ this.Expression_GetFactor,
+
+	/* 3 */ this.Expression_GetXScroll,
+	/* 4 */ this.Expression_GetYScroll,
+	/* 5 */ this.Expression_GetXScrollTarget,
+	/* 6 */ this.Expression_GetYScrollTarget,
+	/* 7 */ this.Expression_GetXSpeed,
+	/* 8 */ this.Expression_GetYSpeed
 	];
 }
 //
-CRunDarkEdif_Template.prototype = CServices.extend(new CRunExtension(), {
+CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 	/// <summary> Prototype definition </summary>
 	/// <description> This class is a sub-class of CRunExtension, by the mean of the
 	/// CServices.extend function which copies all the properties of
@@ -279,7 +357,7 @@ CRunDarkEdif_Template.prototype = CServices.extend(new CRunExtension(), {
 	getNumberOfConditions: function() {
 		/// <summary> Returns the number of conditions </summary>
 		/// <returns type="Number" isInteger="true"> Warning, if this number is not correct, the application _will_ crash</returns>
-		return 1; // $conditionFuncs not available yet
+		return 6; // $conditionFuncs not available yet
 	},
 
 	createRunObject: function(file, cob, version) {
@@ -302,8 +380,28 @@ CRunDarkEdif_Template.prototype = CServices.extend(new CRunExtension(), {
 		// DarkEdif properties are accessible as on other platforms: IsPropChecked(), GetPropertyStr(), GetPropertyNum()
 		let props = new darkEdif['Properties'](this, file, version);
 
-		this.checkboxWithinFolder = props['IsPropChecked']("Checkbox within folder");
-		this.editable6Text = props['GetPropertyStr']("Editable 6");
+		this.Divisor = props['GetPropertyNum']("Divisor");
+		this.Margin = props['GetPropertyNum']("Margin");
+		this.Factor = this.Clamp(props['GetPropertyNum']("Factor"), 0, 100);
+
+		this.CenterDisplay = props['IsPropChecked']("Auto Center Display");
+		this.Easing = props['IsPropChecked']("Easing");
+		this.HoriScrolling = props['IsPropChecked']("Horizontal Scrolling");
+		this.VertScrolling = props['IsPropChecked']("Vertical Scrolling");
+		this.Peytonphile = props['IsPropChecked']("Peytonphile Scrolling");
+
+		this._resX = this.GetFrameRight() - this.GetFrameLeft();
+		this._resY = this.GetFrameBottom() - this.GetFrameTop();
+
+		this._scrollingX = this.GetVirtualWidth() / 2;
+		this._scrollingXTarget = this._scrollingX;
+		if (this.CenterDisplay)
+			this.SetFrameCenterX(this._scrollingX);
+
+		this._scrollingY = this.GetVirtualHeight() / 2;
+		this._scrollingYTarget = this._scrollingY;
+		if (this.CenterDisplay)
+			this.SetFrameCenterY(this._scrollingY);
 
 		// The return value is not used in this version of the runtime: always return false.
 		return false;
@@ -316,7 +414,113 @@ CRunDarkEdif_Template.prototype = CServices.extend(new CRunExtension(), {
 		///							   0 : this function will be called during the next loop
 		/// CRunExtension.REFLAG_ONESHOT : this function will not be called anymore,
 		///								   unless this.reHandle() is called. </returns>
-		return CRunExtension.REFLAG_ONESHOT;
+		
+		this._resX = this.GetFrameRight() - this.GetFrameLeft();
+		this._resY = this.GetFrameBottom() - this.GetFrameTop();
+
+		this._dt = this.GetDelta();
+
+		if (!this.Peytonphile)
+		{
+			this._marginMiddleX = this.Clamp(this.Clamp(this.GetMouseX(), this.GetFrameLeft(), this.GetFrameRight()) - this.GetFrameLeft(), ((this._resX / 2) - (this.Margin / 2)), ((this._resX / 2) + (this.Margin / 2)));
+			this._marginMiddleY = this.Clamp(this.Clamp(this.GetMouseY(), this.GetFrameTop(), this.GetFrameBottom()) - this.GetFrameTop(), ((this._resY / 2) - (this.Margin / 2)), ((this._resY / 2) + (this.Margin / 2)));
+			this._xSpeed = 0;
+			this._ySpeed = 0;
+		}
+
+		if (!this._dontScroll)
+			this._changed = false;
+
+		if (!this._dontScroll && this.HoriScrolling && !this.Peytonphile)
+			this._xSpeed = ((this.Clamp(this.GetMouseX(), this.GetFrameLeft(), this.GetFrameRight()) - this.GetFrameLeft()) - this._marginMiddleX) / this.Divisor;
+
+		if (!this._dontScroll && this.VertScrolling && !this.Peytonphile)
+			this._ySpeed = ((this.Clamp(this.GetMouseY(), this.GetFrameTop(), this.GetFrameBottom()) - this.GetFrameTop()) - this._marginMiddleY) / (this.Divisor + 0.0) * ((this._resX + 0.0) / this._resY);
+
+		if (!this.Peytonphile && this.HoriScrolling)
+			this._scrollingXTarget = this.Clamp((this._scrollingXTarget + (this._xSpeed * this._dt)), (this._resX / 2), (this.GetVirtualWidth() - (this._resX / 2)));
+
+		if (!this.Peytonphile && this.VertScrolling)
+			this._scrollingYTarget = this.Clamp((this._scrollingYTarget + (this._ySpeed * this._dt)), (this._resY / 2), (this.GetVirtualHeight() - (this._resY / 2)));
+
+		if (!this.Easing && this.HoriScrolling && !this._dontScroll)
+		{
+			this._scrollingX = this._scrollingXTarget;
+			if (this.CenterDisplay)
+				this.SetFrameCenterX(this._scrollingX);
+		}
+
+		if (!this.Easing && this.VertScrolling && !this._dontScroll)
+		{
+			this._scrollingY = this._scrollingYTarget;
+			if (this.CenterDisplay)
+				this.SetFrameCenterY(this._scrollingY);
+		}
+
+		if (this.Easing && this.HoriScrolling && !this._dontScroll)
+		{
+			this._scrollingX = this._scrollingX + (this._scrollingXTarget - this._scrollingX) * ((this.Factor / 100.0) * this._dt);
+			if (this.CenterDisplay)
+				this.SetFrameCenterX(this._scrollingX);
+		}
+
+		if (this.Easing && this.VertScrolling && !this._dontScroll)
+		{
+			this._scrollingY = this._scrollingY + (this._scrollingYTarget - this._scrollingY) * ((this.Factor / 100.0) * this._dt);
+			if (this.CenterDisplay)
+				this.SetFrameCenterY(this._scrollingY);
+		}
+
+		if (this.Easing && this._dontScroll)
+		{
+			if (!this._savedLast)
+			{
+				this._lastX = this.GetFrameLeft() + (this._resX / 2);
+				this._lastY = this.GetFrameTop() + (this._resY / 2);
+			}
+			this._savedLast = true;
+		}
+		else
+			this._savedLast = false;
+
+		if (this.Easing && this._dontScroll && !this._changed)
+		{
+			if (this.GetFrameLeft() + (this._resX / 2) != this._lastX || this.GetFrameTop() + (this._resY / 2) != this._lastY)
+				this._changed = true;
+			else
+			{
+				if (this.HoriScrolling)
+				{
+					this._scrollingX = this._scrollingX + (this._scrollingXTarget - this._scrollingX) * ((this.Factor / 100.0) * this._dt);
+					if (this.CenterDisplay)
+						this.SetFrameCenterX(this._scrollingX);
+				}
+
+				if (this.VertScrolling)
+				{
+					this._scrollingY = this._scrollingY + (this._scrollingYTarget - this._scrollingY) * ((this.Factor / 100.0) * this._dt);
+					if (this.CenterDisplay)
+						this.SetFrameCenterY(this._scrollingY);
+				}
+
+				this._lastX = this.GetFrameLeft() + (this._resX / 2);
+				this._lastY = this.GetFrameBottom() + (this._resY / 2);
+			}
+		}
+
+		if (this.Peytonphile)
+		{
+			this._xSpeed = 0;
+			this._ySpeed = 0;
+
+			if (!this._dontScroll && this.HoriScrolling)
+				this._scrollingXTarget = this.Clamp((this.GetVirtualWidth() / 2) + (((this.GetMouseX() - ((this.GetVirtualWidth()) / 2))) * ((this.GetVirtualWidth() - (this._resX + 0.0)) / this.GetVirtualWidth())), (this._resX / 2), this.GetVirtualWidth() - (this._resX / 2));
+
+			if (!this._dontScroll && this.VertScrolling)
+				this._scrollingYTarget = this.Clamp((this.GetVirtualHeight() / 2) + (((this.GetMouseY() - ((this.GetVirtualHeight()) / 2))) * ((this.GetVirtualHeight() - (this._resY + 0.0)) / this.GetVirtualHeight())), (this._resY / 2), this.GetVirtualHeight() - (this._resY / 2));
+		}
+
+		return 0;
 	},
 
 	condition: function(num, cnd) {
@@ -381,6 +585,80 @@ CRunDarkEdif_Template.prototype = CServices.extend(new CRunExtension(), {
 		}
 
 		return func.apply(this, args);
+	},
+	GetFrameRight: function()
+	{
+		var r = this.rh.rhWindowX;
+		if ((this.rh.rh3Scrolling & CRun.RH3SCROLLING_SCROLL) != 0)
+			r = this.rh.rh3DisplayX;
+		r += this.rh.rh3WindowSx;
+		if (r > this.rh.rhLevelSx)
+			r = this.rh.rhLevelSx;
+		return r;
+	},
+	GetFrameLeft: function()
+	{
+		var r = this.rh.rhWindowX;
+		if ((this.rh.rh3Scrolling & CRun.RH3SCROLLING_SCROLL) != 0)
+			r = this.rh.rh3DisplayX;
+		if (r < 0)
+			r = 0;
+		return r;
+	},
+	GetFrameBottom: function()
+	{
+		var r = this.rh.rhWindowY;
+		if ((this.rh.rh3Scrolling & CRun.RH3SCROLLING_SCROLL) != 0)
+			r = this.rh.rh3DisplayY;
+		r += this.rh.rh3WindowSy;
+		if (r > this.rh.rhLevelSy)
+			r = this.rh.rhLevelSy;
+		return r;
+	},
+	GetFrameTop: function()
+	{
+		var r = this.rh.rhWindowY;
+		if ((this.rh.rh3Scrolling & CRun.RH3SCROLLING_SCROLL) != 0)
+			r = this.rh.rh3DisplayY;
+		if (r < 0)
+			r = 0;
+		return r;
+	},
+	SetFrameCenterX: function(centerX)
+	{
+		this.rh.setDisplay(centerX, 0, -1, 1)
+	},
+	SetFrameCenterY: function(centerY)
+	{
+		this.rh.setDisplay(0, centerY, -1, 2)
+	},
+	Clamp: function(value, min, max)
+	{
+		if (value < min)
+			value = min;
+		if (value > max)
+			value = max;
+		return value;
+	},
+	GetMouseX: function()
+	{
+		return this.rh.rh2MouseX;
+	},
+	GetMouseY: function()
+	{
+		return this.rh.rh2MouseY;
+	},
+	GetDelta: function()
+	{
+		return this.rh.rh4MvtTimerCoef;
+	},
+	GetVirtualWidth: function()
+	{
+		return this.rh.rhFrame.leVirtualRect.right;
+	},
+	GetVirtualHeight: function()
+	{
+		return this.rh.rhFrame.leVirtualRect.bottom;
 	}
 
 	// No comma for the last function : the Google compiler

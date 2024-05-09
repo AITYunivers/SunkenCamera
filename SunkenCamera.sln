@@ -7,6 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SunkenCamera.Windows", "Sun
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SunkenCamera.Shared", "SunkenCamera.Shared.vcxitems", "{633109E6-84FE-4B06-B91B-994BC389AD34}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HTML5", "HTML5", "{8A5D0AFE-4FA7-4AB3-89A2-A18A7D75F9EE}"
+	ProjectSection(SolutionItems) = preProject
+		HTML5\SunkenCamera.js = HTML5\SunkenCamera.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Unicode|ARM = Debug Unicode|ARM
