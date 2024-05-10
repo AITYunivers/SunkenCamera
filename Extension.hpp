@@ -71,12 +71,8 @@ public:
 	float _dt;
 	float _xSpeed;
 	float _ySpeed;
-	float _lastX;
-	float _lastY;
 
 	bool _dontScroll;
-	bool _savedLast;
-	bool _changed;
 
 	int GetFrameRight();
 	int GetFrameLeft();

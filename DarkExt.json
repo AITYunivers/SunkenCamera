@@ -118,25 +118,25 @@
 			{
 				"Title": "Set Camera Position X to %0",
 				"Parameters": [
-					[ "Integer", "Enter value" ]
+					[ "Float", "Enter value" ]
 				]
 			},
 			{
 				"Title": "Set Camera Position Y to %0",
 				"Parameters": [
-					[ "Integer", "Enter value" ]
+					[ "Float", "Enter value" ]
 				]
 			},
 			{
 				"Title": "Set Camera Target X to %0",
 				"Parameters": [
-					[ "Integer", "Enter value" ]
+					[ "Float", "Enter value" ]
 				]
 			},
 			{
 				"Title": "Set Camera Target Y to %0",
 				"Parameters": [
-					[ "Integer", "Enter value" ]
+					[ "Float", "Enter value" ]
 				]
 			},
 			{

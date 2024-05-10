@@ -430,9 +430,9 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 		this.HoriFlipped = props['IsPropChecked']("Input Flipped Horizontally");
 		this.VertFlipped = props['IsPropChecked']("Input Flipped Vertically");
 
-		this._marginMiddleX = this._marginMiddleY = this._dt =
-		this._xSpeed = this._ySpeed = this._lastX = this._lastY = 0;
-		this._dontScroll = this._savedLast = this._changed = false;
+		this._marginMiddleX = this._marginMiddleY =
+		this._dt = this._xSpeed = this._ySpeed = 0;
+		this._dontScroll = false;
 
 		this._resX = this.GetFrameRight() - this.GetFrameLeft();
 		this._resY = this.GetFrameBottom() - this.GetFrameTop();
@@ -471,85 +471,45 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 			this._xSpeed = 0;
 			this._ySpeed = 0;
 		}
-
-		if (!this._dontScroll)
-			this._changed = false;
-
+		
 		if (!this._dontScroll && this.HoriScrolling && !this.Peytonphile)
+		{
 			this._xSpeed = ((this.Clamp(this.GetMouseX(), this.GetFrameLeft(), this.GetFrameRight()) - this.GetFrameLeft()) - this._marginMiddleX) / this.Divisor;
+			this._scrollingXTarget = this.Clamp((this._scrollingXTarget + (this._xSpeed * this._dt)), (this._resX / 2), (this.GetVirtualWidth() - (this._resX / 2)));
+		}
 
 		if (!this._dontScroll && this.VertScrolling && !this.Peytonphile)
+		{
 			this._ySpeed = ((this.Clamp(this.GetMouseY(), this.GetFrameTop(), this.GetFrameBottom()) - this.GetFrameTop()) - this._marginMiddleY) / (this.Divisor + 0.0) * ((this._resX + 0.0) / this._resY);
-
-		if (!this.Peytonphile && this.HoriScrolling)
-			this._scrollingXTarget = this.Clamp((this._scrollingXTarget + (this._xSpeed * this._dt)), (this._resX / 2), (this.GetVirtualWidth() - (this._resX / 2)));
-
-		if (!this.Peytonphile && this.VertScrolling)
 			this._scrollingYTarget = this.Clamp((this._scrollingYTarget + (this._ySpeed * this._dt)), (this._resY / 2), (this.GetVirtualHeight() - (this._resY / 2)));
+		}
 
-		if (!this.Easing && this.HoriScrolling && !this._dontScroll)
+		if (!this.Easing && this.HoriScrolling)
 		{
 			this._scrollingX = this._scrollingXTarget;
 			if (this.CenterDisplay)
 				this.SetFrameCenterX(this._scrollingX);
 		}
 
-		if (!this.Easing && this.VertScrolling && !this._dontScroll)
+		if (!this.Easing && this.VertScrolling)
 		{
 			this._scrollingY = this._scrollingYTarget;
 			if (this.CenterDisplay)
 				this.SetFrameCenterY(this._scrollingY);
 		}
 
-		if (this.Easing && this.HoriScrolling && !this._dontScroll)
+		if (this.Easing && this.HoriScrolling)
 		{
 			this._scrollingX = this._scrollingX + (this._scrollingXTarget - this._scrollingX) * ((this.Factor / 100.0) * this._dt);
 			if (this.CenterDisplay)
 				this.SetFrameCenterX(this._scrollingX);
 		}
 
-		if (this.Easing && this.VertScrolling && !this._dontScroll)
+		if (this.Easing && this.VertScrolling)
 		{
 			this._scrollingY = this._scrollingY + (this._scrollingYTarget - this._scrollingY) * ((this.Factor / 100.0) * this._dt);
 			if (this.CenterDisplay)
 				this.SetFrameCenterY(this._scrollingY);
-		}
-
-		if (this.Easing && this._dontScroll)
-		{
-			if (!this._savedLast)
-			{
-				this._lastX = this.GetFrameLeft() + (this._resX / 2);
-				this._lastY = this.GetFrameTop() + (this._resY / 2);
-			}
-			this._savedLast = true;
-		}
-		else
-			this._savedLast = false;
-
-		if (this.Easing && this._dontScroll && !this._changed)
-		{
-			if (this.GetFrameLeft() + (this._resX / 2) != this._lastX || this.GetFrameTop() + (this._resY / 2) != this._lastY)
-				this._changed = true;
-			else
-			{
-				if (this.HoriScrolling)
-				{
-					this._scrollingX = this._scrollingX + (this._scrollingXTarget - this._scrollingX) * ((this.Factor / 100.0) * this._dt);
-					if (this.CenterDisplay)
-						this.SetFrameCenterX(this._scrollingX);
-				}
-
-				if (this.VertScrolling)
-				{
-					this._scrollingY = this._scrollingY + (this._scrollingYTarget - this._scrollingY) * ((this.Factor / 100.0) * this._dt);
-					if (this.CenterDisplay)
-						this.SetFrameCenterY(this._scrollingY);
-				}
-
-				this._lastX = this.GetFrameLeft() + (this._resX / 2);
-				this._lastY = this.GetFrameBottom() + (this._resY / 2);
-			}
 		}
 
 		if (this.Peytonphile)

@@ -34,8 +34,8 @@ Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr) :
 
 	LinkAction(9,  SetCameraPosX);
 	LinkAction(10, SetCameraPosY);
-	LinkAction(11, SetCameraTargetY);
-	LinkAction(12, SetCameraTargetX);
+	LinkAction(11, SetCameraTargetX);
+	LinkAction(12, SetCameraTargetY);
 
 	LinkAction(13, FlipHorizontally);
 	LinkAction(14, FlipVertically);
@@ -165,9 +165,9 @@ Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr) :
 	HoriFlipped = edPtr->Props.IsPropChecked("Input Flipped Horizontally"sv);
 	VertFlipped = edPtr->Props.IsPropChecked("Input Flipped Vertically"sv);
 
-	_marginMiddleX = _marginMiddleY = _dt =
-	_xSpeed = _ySpeed = _lastX = _lastY = 0;
-	_dontScroll = _savedLast = _changed = false;
+	_marginMiddleX = _marginMiddleY =
+	_dt = _xSpeed = _ySpeed = 0;
+	_dontScroll = false;
 
 	_resX = GetFrameRight() - GetFrameLeft();
 	_resY = GetFrameBottom() - GetFrameTop();
@@ -204,84 +204,44 @@ REFLAG Extension::Handle()
 		_ySpeed = 0;
 	}
 
-	if (!_dontScroll)
-		_changed = false;
-
 	if (!_dontScroll && HoriScrolling && !Peytonphile)
+	{
 		_xSpeed = ((Clamp(GetMouseX(), GetFrameLeft(), GetFrameRight()) - GetFrameLeft()) - _marginMiddleX) / Divisor;
+		_scrollingXTarget = Clamp((_scrollingXTarget + (_xSpeed * _dt)), (_resX / 2), (GetVirtualWidth() - (_resX / 2)));
+	}
 
 	if (!_dontScroll && VertScrolling && !Peytonphile)
+	{
 		_ySpeed = ((Clamp(GetMouseY(), GetFrameTop(), GetFrameBottom()) - GetFrameTop()) - _marginMiddleY) / (Divisor + 0.0f) * ((_resX + 0.0f) / _resY);
-
-	if (!Peytonphile && HoriScrolling)
-		_scrollingXTarget = Clamp((_scrollingXTarget + (_xSpeed * _dt)), (_resX / 2), (GetVirtualWidth() - (_resX / 2)));
-
-	if (!Peytonphile && VertScrolling)
 		_scrollingYTarget = Clamp((_scrollingYTarget + (_ySpeed * _dt)), (_resY / 2), (GetVirtualHeight() - (_resY / 2)));
+	}
 
-	if (!Easing && HoriScrolling && !_dontScroll)
+	if (!Easing && HoriScrolling)
 	{
 		_scrollingX = _scrollingXTarget;
 		if (CenterDisplay)
 			SetFrameCenterX(_scrollingX);
 	}
 
-	if (!Easing && VertScrolling && !_dontScroll)
+	if (!Easing && VertScrolling)
 	{
 		_scrollingY = _scrollingYTarget;
 		if (CenterDisplay)
 			SetFrameCenterY(_scrollingY);
 	}
 
-	if (Easing && HoriScrolling && !_dontScroll)
+	if (Easing && HoriScrolling)
 	{
 		_scrollingX = _scrollingX + (_scrollingXTarget - _scrollingX) * ((Factor / 100.0f) * _dt);
 		if (CenterDisplay)
 			SetFrameCenterX(_scrollingX);
 	}
 
-	if (Easing && VertScrolling && !_dontScroll)
+	if (Easing && VertScrolling)
 	{
 		_scrollingY = _scrollingY + (_scrollingYTarget - _scrollingY) * ((Factor / 100.0f) * _dt);
 		if (CenterDisplay)
 			SetFrameCenterY(_scrollingY);
-	}
-
-	if (Easing && _dontScroll)
-	{
-		if (!_savedLast)
-		{
-			_lastX = GetFrameLeft() + (_resX / 2);
-			_lastY = GetFrameTop() + (_resY / 2);
-		}
-		_savedLast = true;
-	}
-	else
-		_savedLast = false;
-
-	if (Easing && _dontScroll && !_changed)
-	{
-		if (GetFrameLeft() + (_resX / 2) != _lastX || GetFrameTop() + (_resY / 2) != _lastY)
-			_changed = true;
-		else
-		{
-			if (HoriScrolling)
-			{
-				_scrollingX = _scrollingX + (_scrollingXTarget - _scrollingX) * ((Factor / 100.0f) * _dt);
-				if (CenterDisplay)
-					SetFrameCenterX(_scrollingX);
-			}
-
-			if (VertScrolling)
-			{
-				_scrollingY = _scrollingY + (_scrollingYTarget - _scrollingY) * ((Factor / 100.0f) * _dt);
-				if (CenterDisplay)
-					SetFrameCenterY(_scrollingY);
-			}
-
-			_lastX = GetFrameLeft() + (_resX / 2);
-			_lastY = GetFrameBottom() + (_resY / 2);
-		}
 	}
 
 	if (Peytonphile)
@@ -429,7 +389,7 @@ int Extension::GetMouseX()
 	if (HoriFlipped)
 		return (_resX - rhPtr->rh2.MouseClient.x) + rhPtr->rh3.DisplayX;
 	else
-		return rhPtr->rh2.MouseClient.x + rhPtr->rh3.DisplayX;
+		return rhPtr->rh2.Mouse.x;
 #endif
 }
 
@@ -439,7 +399,7 @@ int Extension::GetMouseY()
 	if (VertFlipped)
 		return (_resY - rhPtr->rh2.MouseClient.y) + rhPtr->rh3.DisplayY;
 	else
-		return rhPtr->rh2.MouseClient.y + rhPtr->rh3.DisplayY;
+		return rhPtr->rh2.Mouse.y;
 #endif
 }
 
