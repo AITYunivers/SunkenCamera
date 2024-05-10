@@ -210,7 +210,7 @@ function CRunSunkenCamera() {
 
 	// DarkEdif SDK exts should have these four variables defined.
 	// We need this[] and globalThis[] instead of direct because HTML5 Final Project minifies and breaks the names otherwise
-	this['ExtensionVersion'] = 1; // To match C++ version
+	this['ExtensionVersion'] = 2; // To match C++ version
 	this['SDKVersion'] = 19; // To match C++ version
 	this['DebugMode'] = true;
 	this['ExtensionName'] = 'DarkEdif Template';
