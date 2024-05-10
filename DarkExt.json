@@ -6,19 +6,33 @@
 			"Name": "Sunken Camera",
 			"Author": "Sunken Studios and Yunivers",
 			"Copyright": "Copyright \u00A9 2024 Yunivers",
-			"Comment": "Version 1.0.5"
+			"Comment": "Version 1.0.6"
 		},
 		"ActionMenu": [
 			[ 0, "Set Divisor" ],
 			[ 1, "Set Margin" ],
 			[ 2, "Set Factor" ],
 			"---",
-			[ 3, "Allow/Disallow Scrolling"],
-			[ 8, "Set Center Display"],
-			[ 4, "Set Easing"],
-			[ 5, "Set Horizontal Scrolling"],
-			[ 6, "Set Vertical Scrolling"],
-			[ 7, "Set Peytonphile Scrolling"]
+			[ 3, "Allow/Disallow Scrolling" ],
+			[ 8, "Set Center Display" ],
+			[ 4, "Set Easing" ],
+			[ 5, "Set Horizontal Scrolling" ],
+			[ 6, "Set Vertical Scrolling" ],
+			[ 7, "Set Peytonphile Scrolling" ],
+			"---",
+			[
+				"Set Camera Position",
+				[ 9, "Set Camera Position X" ],
+				[ 10, "Set Camera Position Y" ],
+				[ 11, "Set Camera Target X (Easing)" ],
+				[ 12, "Set Camera Target Y (Easing)" ]
+			],
+			"---",
+			[
+				"Flip Input",
+				[ 13, "Flip Input Horizontally" ],
+				[ 14, "Flip Input Vertically" ]
+			]
 		],
 		"ConditionMenu": [
 			[ 0, "Scrolling is disallowed" ],
@@ -26,7 +40,13 @@
 			[ 1, "Easing is enabled" ],
 			[ 2, "Horizontal Scrolling is enabled" ],
 			[ 3, "Vertical Scrolling is enabled" ],
-			[ 4, "Peytonphile Scrolling is enabled" ]
+			[ 4, "Peytonphile Scrolling is enabled" ],
+			"---",
+			[
+				"Input is flipped",
+				[ 6, "Horizontal input is flipped" ],
+				[ 7, "Vertical input is flipped" ]
+			]
 		],
 		"ExpressionMenu": [
 			[ 0, "Get Divisor" ],
@@ -94,6 +114,36 @@
 				"Parameters": [
 					[ "Integer", "Enter value (0 = OFF, otherwise ON)" ]
 				]
+			},
+			{
+				"Title": "Set Camera Position X to %0",
+				"Parameters": [
+					[ "Integer", "Enter value" ]
+				]
+			},
+			{
+				"Title": "Set Camera Position Y to %0",
+				"Parameters": [
+					[ "Integer", "Enter value" ]
+				]
+			},
+			{
+				"Title": "Set Camera Target X to %0",
+				"Parameters": [
+					[ "Integer", "Enter value" ]
+				]
+			},
+			{
+				"Title": "Set Camera Target Y to %0",
+				"Parameters": [
+					[ "Integer", "Enter value" ]
+				]
+			},
+			{
+				"Title": "Flip Input Horizontally"
+			},
+			{
+				"Title": "Flip Input Vertically"
 			}
 		],
 		"Conditions": [
@@ -119,6 +169,14 @@
 			},
 			{
 				"Title": "%o : Is Center Display Enabled?",
+				"Triggered": false
+			},
+			{
+				"Title": "%o : Is Input Flipped Horizontally?",
+				"Triggered": false
+			},
+			{
+				"Title": "%o : Is Input Flipped Vertically?",
 				"Triggered": false
 			}
 		],
@@ -210,6 +268,18 @@
 			{
 				"Title": "Peytonphile Scrolling",
 				"Info": "Frame centered based on your cursor position scaled to the frame size.",
+				"Type": "Checkbox",
+				"DefaultState": false
+			},
+			{
+				"Title": "Input Flipped Horizontally",
+				"Info": "If enabled, the extension will read the MouseX as `Width - MouseX`.",
+				"Type": "Checkbox",
+				"DefaultState": false
+			},
+			{
+				"Title": "Input Flipped Vertically",
+				"Info": "If enabled, the extension will read the MouseY as `Height - MouseY`.",
 				"Type": "Checkbox",
 				"DefaultState": false
 			}

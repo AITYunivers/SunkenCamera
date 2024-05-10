@@ -57,6 +57,8 @@ public:
 	bool HoriScrolling;
 	bool VertScrolling;
 	bool Peytonphile;
+	bool HoriFlipped;
+	bool VertFlipped;
 
 	float _scrollingX;
 	float _scrollingY;
@@ -115,6 +117,14 @@ public:
 		void SetVertScrolling(int setting);
 		void SetPeytonphile(int setting);
 
+		void SetCameraPosX(float cameraX);
+		void SetCameraPosY(float cameraY);
+		void SetCameraTargetX(float cameraX);
+		void SetCameraTargetY(float cameraY);
+
+		void FlipHorizontally();
+		void FlipVertically();
+
 	/// Conditions
 
 		bool CheckDisallowScrolling();
@@ -123,6 +133,9 @@ public:
 		bool CheckHoriScrolling();
 		bool CheckVertScrolling();
 		bool CheckPeytonphile();
+
+		bool CheckHoriFlipped();
+		bool CheckVertFlipped();
 
 	/// Expressions
 

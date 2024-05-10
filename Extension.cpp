@@ -21,16 +21,24 @@ Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr) :
 		IDs in the JSON here
 	*/
 
-	LinkAction(0, SetDivisor);
-	LinkAction(1, SetMargin);
-	LinkAction(2, SetFactor);
+	LinkAction(0,  SetDivisor);
+	LinkAction(1,  SetMargin);
+	LinkAction(2,  SetFactor);
 
-	LinkAction(3, SetDisallowScrolling);
-	LinkAction(8, SetCenterDisplay);
-	LinkAction(4, SetEasing);
-	LinkAction(5, SetHoriScrolling);
-	LinkAction(6, SetVertScrolling);
-	LinkAction(7, SetPeytonphile);
+	LinkAction(3,  SetDisallowScrolling);
+	LinkAction(8,  SetCenterDisplay);
+	LinkAction(4,  SetEasing);
+	LinkAction(5,  SetHoriScrolling);
+	LinkAction(6,  SetVertScrolling);
+	LinkAction(7,  SetPeytonphile);
+
+	LinkAction(9,  SetCameraPosX);
+	LinkAction(10, SetCameraPosY);
+	LinkAction(11, SetCameraTargetY);
+	LinkAction(12, SetCameraTargetX);
+
+	LinkAction(13, FlipHorizontally);
+	LinkAction(14, FlipVertically);
 
 
 	LinkCondition(0, CheckDisallowScrolling);
@@ -39,6 +47,8 @@ Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr) :
 	LinkCondition(2, CheckHoriScrolling);
 	LinkCondition(3, CheckVertScrolling);
 	LinkCondition(4, CheckPeytonphile);
+	LinkCondition(6, CheckHoriFlipped);
+	LinkCondition(7, CheckVertFlipped);
 
 
 	LinkExpression(0, GetDivisor);
@@ -151,6 +161,9 @@ Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr) :
 	HoriScrolling = edPtr->Props.IsPropChecked("Horizontal Scrolling"sv);
 	VertScrolling = edPtr->Props.IsPropChecked("Vertical Scrolling"sv);
 	Peytonphile = edPtr->Props.IsPropChecked("Peytonphile Scrolling"sv);
+
+	HoriFlipped = edPtr->Props.IsPropChecked("Input Flipped Horizontally"sv);
+	VertFlipped = edPtr->Props.IsPropChecked("Input Flipped Vertically"sv);
 
 	_marginMiddleX = _marginMiddleY = _dt =
 	_xSpeed = _ySpeed = _lastX = _lastY = 0;
@@ -413,14 +426,20 @@ double Extension::Clamp(double value, double min, double max)
 int Extension::GetMouseX()
 {
 #ifdef _WIN32
-	return rhPtr->rh2.Mouse.x;
+	if (HoriFlipped)
+		return (_resX - rhPtr->rh2.MouseClient.x) + rhPtr->rh3.DisplayX;
+	else
+		return rhPtr->rh2.MouseClient.x + rhPtr->rh3.DisplayX;
 #endif
 }
 
 int Extension::GetMouseY()
 {
 #ifdef _WIN32
-	return rhPtr->rh2.Mouse.y;
+	if (VertFlipped)
+		return (_resY - rhPtr->rh2.MouseClient.y) + rhPtr->rh3.DisplayY;
+	else
+		return rhPtr->rh2.MouseClient.y + rhPtr->rh3.DisplayY;
 #endif
 }
 

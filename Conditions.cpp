@@ -29,3 +29,13 @@ bool Extension::CheckPeytonphile()
 {
 	return Peytonphile;
 }
+
+bool Extension::CheckHoriFlipped()
+{
+	return HoriFlipped;
+}
+
+bool Extension::CheckVertFlipped()
+{
+	return VertFlipped;
+}

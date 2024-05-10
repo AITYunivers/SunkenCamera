@@ -251,6 +251,26 @@ function CRunSunkenCamera() {
 	this.Action_SetPeytonphile = function (setting) {
 		this.Peytonphile = setting != 0;
 	};
+	this.Action_SetCameraPosX = function (cameraX) {
+		this._scrollingX = cameraX;
+		this._scrollingXTarget = cameraX;
+	};
+	this.Action_SetCameraPosY = function (cameraY) {
+		this._scrollingY = cameraY;
+		this._scrollingYTarget = cameraY;
+	};
+	this.Action_SetCameraTargetX = function (cameraX) {
+		this._scrollingXTarget = cameraX;
+	};
+	this.Action_SetCameraTargetY = function (cameraY) {
+		this._scrollingYTarget = cameraY;
+	};
+	this.Action_FlipHorizontally = function () {
+		this.HoriFlipped = !this.HoriFlipped;
+	};
+	this.Action_FlipVertically = function () {
+		this.VertFlipped = !this.VertFlipped;
+	};
 
 	// ======================================================================================================
 	// Conditions
@@ -272,6 +292,12 @@ function CRunSunkenCamera() {
 	};
 	this.Condition_CheckPeytonphile = function () {
 		return Peytonphile;
+	};
+	this.Condition_CheckHoriFlipped = function () {
+		return HoriFlipped;
+	};
+	this.Condition_CheckVertFlipped = function () {
+		return VertFlipped;
 	};
 
 	// =============================
@@ -311,16 +337,24 @@ function CRunSunkenCamera() {
 	// =============================
 
 	this.$actionFuncs = [
-	/* 0 */ this.Action_SetDivisor,
-	/* 1 */ this.Action_SetMargin,
-	/* 2 */ this.Action_SetFactor,
+	/* 0  */ this.Action_SetDivisor,
+	/* 1  */ this.Action_SetMargin,
+	/* 2  */ this.Action_SetFactor,
 
-	/* 3 */ this.Action_SetDisallowScrolling,
-	/* 4 */ this.Action_SetEasing,
-	/* 5 */ this.Action_SetHoriScrolling,
-	/* 6 */ this.Action_SetVertScrolling,
-	/* 7 */ this.Action_SetPeytonphile,
-	/* 8 */ this.Action_SetCenterDisplay
+	/* 3  */ this.Action_SetDisallowScrolling,
+	/* 4  */ this.Action_SetEasing,
+	/* 5  */ this.Action_SetHoriScrolling,
+	/* 6  */ this.Action_SetVertScrolling,
+	/* 7  */ this.Action_SetPeytonphile,
+	/* 8  */ this.Action_SetCenterDisplay,
+
+	/* 9  */ this.Action_SetCameraPosX,
+	/* 10 */ this.Action_SetCameraPosY,
+	/* 11 */ this.Action_SetCameraTargetX,
+	/* 12 */ this.Action_SetCameraTargetY,
+
+	/* 13 */ this.Action_FlipHorizontally,
+	/* 14 */ this.Action_FlipVertically,
 	];
 
 	this.$conditionFuncs = [
@@ -329,7 +363,10 @@ function CRunSunkenCamera() {
 	/* 2 */ this.Condition_CheckHoriScrolling,
 	/* 3 */ this.Condition_CheckVertScrolling,
 	/* 4 */ this.Condition_CheckPeytonphile,
-	/* 5 */ this.Condition_CheckCenterDisplay
+	/* 5 */ this.Condition_CheckCenterDisplay,
+
+	/* 6 */ this.Condition_CheckHoriFlipped,
+	/* 7 */ this.Condition_CheckVertFlipped
 	];
 
 	this.$expressionFuncs = [
@@ -389,6 +426,9 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 		this.HoriScrolling = props['IsPropChecked']("Horizontal Scrolling");
 		this.VertScrolling = props['IsPropChecked']("Vertical Scrolling");
 		this.Peytonphile = props['IsPropChecked']("Peytonphile Scrolling");
+
+		this.HoriFlipped = props['IsPropChecked']("Input Flipped Horizontally");
+		this.VertFlipped = props['IsPropChecked']("Input Flipped Vertically");
 
 		this._marginMiddleX = this._marginMiddleY = this._dt =
 		this._xSpeed = this._ySpeed = this._lastX = this._lastY = 0;
@@ -646,11 +686,17 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 	},
 	GetMouseX: function()
 	{
-		return this.rh.rh2MouseX;
+		if (this.HoriFlipped)
+			return (this._resX - (this.rh.rh2MouseX - this.rh.rh3DisplayX)) + this.rh.rh3DisplayX;
+		else
+			return this.rh.rh2MouseX;
 	},
 	GetMouseY: function()
 	{
-		return this.rh.rh2MouseY;
+		if (this.VertFlipped)
+			return (this._resY - (this.rh.rh2MouseY - this.rh.rh3DisplayY)) + this.rh.rh3DisplayY;
+		else
+			return this.rh.rh2MouseY;
 	},
 	GetDelta: function()
 	{

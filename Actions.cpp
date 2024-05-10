@@ -44,3 +44,35 @@ void Extension::SetPeytonphile(int setting)
 {
 	Peytonphile = setting != 0;
 }
+
+void Extension::SetCameraPosX(float cameraX)
+{
+	_scrollingX = cameraX;
+	_scrollingXTarget = cameraX;
+}
+
+void Extension::SetCameraPosY(float cameraY)
+{
+	_scrollingY = cameraY;
+	_scrollingYTarget = cameraY;
+}
+
+void Extension::SetCameraTargetX(float cameraX)
+{
+	_scrollingXTarget = cameraX;
+}
+
+void Extension::SetCameraTargetY(float cameraY)
+{
+	_scrollingYTarget = cameraY;
+}
+
+void Extension::FlipHorizontally()
+{
+	HoriFlipped = !HoriFlipped;
+}
+
+void Extension::FlipVertically()
+{
+	VertFlipped = !VertFlipped;
+}
