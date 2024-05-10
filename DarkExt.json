@@ -6,7 +6,7 @@
 			"Name": "Sunken Camera",
 			"Author": "Sunken Studios and Yunivers",
 			"Copyright": "Copyright \u00A9 2024 Yunivers",
-			"Comment": "Version 1.0.6"
+			"Comment": "Version 1.0.7"
 		},
 		"ActionMenu": [
 			[ 0, "Set Divisor" ],
