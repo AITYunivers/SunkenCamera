@@ -152,6 +152,10 @@ Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr) :
 	VertScrolling = edPtr->Props.IsPropChecked("Vertical Scrolling"sv);
 	Peytonphile = edPtr->Props.IsPropChecked("Peytonphile Scrolling"sv);
 
+	_marginMiddleX = _marginMiddleY = _dt =
+	_xSpeed = _ySpeed = _lastX = _lastY = 0;
+	_dontScroll = _savedLast = _changed = false;
+
 	_resX = GetFrameRight() - GetFrameLeft();
 	_resY = GetFrameBottom() - GetFrameTop();
 

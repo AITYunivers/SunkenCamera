@@ -390,6 +390,10 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 		this.VertScrolling = props['IsPropChecked']("Vertical Scrolling");
 		this.Peytonphile = props['IsPropChecked']("Peytonphile Scrolling");
 
+		this._marginMiddleX = this._marginMiddleY = this._dt =
+		this._xSpeed = this._ySpeed = this._lastX = this._lastY = 0;
+		this._dontScroll = this._savedLast = this._changed = false;
+
 		this._resX = this.GetFrameRight() - this.GetFrameLeft();
 		this._resY = this.GetFrameBottom() - this.GetFrameTop();
 

@@ -365,3 +365,4 @@ FodyWeavers.xsd
 # Compiled stuff
 MFX/
 Temp/
+/DarkExt.PostMinify.json
