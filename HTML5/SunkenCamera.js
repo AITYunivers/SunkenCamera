@@ -500,14 +500,14 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 
 		if (this.Easing && this.HoriScrolling)
 		{
-			this._scrollingX = this._scrollingX + (this._scrollingXTarget - this._scrollingX) * ((this.Factor / 100.0) * this._dt);
+			this._scrollingX = this._scrollingX + (this._scrollingXTarget - this._scrollingX) * Clamp((this.Factor / 100.0) * this._dt, 0, 1);
 			if (this.CenterDisplay)
 				this.SetFrameCenterX(this._scrollingX);
 		}
 
 		if (this.Easing && this.VertScrolling)
 		{
-			this._scrollingY = this._scrollingY + (this._scrollingYTarget - this._scrollingY) * ((this.Factor / 100.0) * this._dt);
+			this._scrollingY = this._scrollingY + (this._scrollingYTarget - this._scrollingY) * Clamp((this.Factor / 100.0) * this._dt, 0, 1);
 			if (this.CenterDisplay)
 				this.SetFrameCenterY(this._scrollingY);
 		}

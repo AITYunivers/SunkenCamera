@@ -232,14 +232,14 @@ REFLAG Extension::Handle()
 
 	if (Easing && HoriScrolling)
 	{
-		_scrollingX = _scrollingX + (_scrollingXTarget - _scrollingX) * ((Factor / 100.0f) * _dt);
+		_scrollingX = _scrollingX + (_scrollingXTarget - _scrollingX) * Clamp((Factor / 100.0f) * _dt, 0.0, 1.0);
 		if (CenterDisplay)
 			SetFrameCenterX(_scrollingX);
 	}
 
 	if (Easing && VertScrolling)
 	{
-		_scrollingY = _scrollingY + (_scrollingYTarget - _scrollingY) * ((Factor / 100.0f) * _dt);
+		_scrollingY = _scrollingY + (_scrollingYTarget - _scrollingY) * Clamp((Factor / 100.0f) * _dt, 0.0, 1.0);
 		if (CenterDisplay)
 			SetFrameCenterY(_scrollingY);
 	}
