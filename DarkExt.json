@@ -6,7 +6,7 @@
 			"Name": "Sunken Camera",
 			"Author": "Sunken Studios and Yunivers",
 			"Copyright": "Copyright \u00A9 2024 Yunivers",
-			"Comment": "Version 1.0.7"
+			"Comment": "Version 1.0.9"
 		},
 		"ActionMenu": [
 			[ 0, "Set Divisor" ],
@@ -282,6 +282,12 @@
 				"Info": "If enabled, the extension will read the MouseY as `Height - MouseY`.",
 				"Type": "Checkbox",
 				"DefaultState": false
+			},
+			{
+				"Title": "Android: Press to Scroll",
+				"Info": "If enabled, the camera will only move if the screen is being held down. (Android Only)",
+				"Type": "Checkbox",
+				"DefaultState": true
 			}
 		]
 	}

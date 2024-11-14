@@ -210,10 +210,10 @@ function CRunSunkenCamera() {
 
 	// DarkEdif SDK exts should have these four variables defined.
 	// We need this[] and globalThis[] instead of direct because HTML5 Final Project minifies and breaks the names otherwise
-	this['ExtensionVersion'] = 2; // To match C++ version
+	this['ExtensionVersion'] = 3; // To match C++ version
 	this['SDKVersion'] = 19; // To match C++ version
-	this['DebugMode'] = true;
-	this['ExtensionName'] = 'DarkEdif Template';
+	this['DebugMode'] = false;
+	this['ExtensionName'] = 'Sunken Camera';
 
 	// Can't find DarkEdif wrapper
 	if (!globalThis.hasOwnProperty('darkEdif')) {
@@ -417,18 +417,18 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 		// DarkEdif properties are accessible as on other platforms: IsPropChecked(), GetPropertyStr(), GetPropertyNum()
 		let props = new darkEdif['Properties'](this, file, version);
 
-		this.Divisor = props['GetPropertyNum']("Divisor");
-		this.Margin = props['GetPropertyNum']("Margin");
-		this.Factor = this.Clamp(props['GetPropertyNum']("Factor"), 0, 100);
+		this.Divisor = props['GetPropertyNum'](0);
+		this.Margin = props['GetPropertyNum'](1);
+		this.Factor = this.Clamp(props['GetPropertyNum'](2), 0, 100);
 
-		this.CenterDisplay = props['IsPropChecked']("Auto Center Display");
-		this.Easing = props['IsPropChecked']("Easing");
-		this.HoriScrolling = props['IsPropChecked']("Horizontal Scrolling");
-		this.VertScrolling = props['IsPropChecked']("Vertical Scrolling");
-		this.Peytonphile = props['IsPropChecked']("Peytonphile Scrolling");
+		this.CenterDisplay = props['IsPropChecked'](3);
+		this.Easing = props['IsPropChecked'](4);
+		this.HoriScrolling = props['IsPropChecked'](5);
+		this.VertScrolling = props['IsPropChecked'](6);
+		this.Peytonphile = props['IsPropChecked'](7);
 
-		this.HoriFlipped = props['IsPropChecked']("Input Flipped Horizontally");
-		this.VertFlipped = props['IsPropChecked']("Input Flipped Vertically");
+		this.HoriFlipped = props['IsPropChecked'](8);
+		this.VertFlipped = props['IsPropChecked'](9);
 
 		this._marginMiddleX = this._marginMiddleY =
 		this._dt = this._xSpeed = this._ySpeed = 0;
@@ -647,16 +647,16 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 	GetMouseX: function()
 	{
 		if (this.HoriFlipped)
-			return (this._resX - (this.rh.rh2MouseX - this.rh.rh3DisplayX)) + this.rh.rh3DisplayX;
+			return (this._resX - this.rh.rh2MouseX) + this.rh.rh3DisplayX;
 		else
-			return this.rh.rh2MouseX;
+			return this.rh.rh2MouseX + this.rh.rh3DisplayX;
 	},
 	GetMouseY: function()
 	{
 		if (this.VertFlipped)
-			return (this._resY - (this.rh.rh2MouseY - this.rh.rh3DisplayY)) + this.rh.rh3DisplayY;
+			return (this._resY - this.rh.rh2MouseY) + this.rh.rh3DisplayY;
 		else
-			return this.rh.rh2MouseY;
+			return this.rh.rh2MouseY + this.rh.rh3DisplayY;
 	},
 	GetDelta: function()
 	{

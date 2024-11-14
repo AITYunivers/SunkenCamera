@@ -10,6 +10,7 @@ Extension::Extension(RunObject* const _rdPtr, const EDITDATA* const edPtr, const
 #elif defined(__ANDROID__)
 Extension::Extension(const EDITDATA* const edPtr, const jobject javaExtPtr) :
 	javaExtPtr(javaExtPtr, "Extension::javaExtPtr from Extension ctor"),
+	crectClass(mainThreadJNIEnv->FindClass("Services/CRect"), "Services/CRect"),
 	Runtime(this, this->javaExtPtr), FusionDebugger(this)
 #else
 Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr) :
@@ -152,18 +153,22 @@ Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr) :
 
 	// Read object DarkEdif properties; you can pass property name, or property index
 	// This will work on all platforms the same way.
-	Divisor = edPtr->Props.GetPropertyNum("Divisor"sv);
-	Margin = edPtr->Props.GetPropertyNum("Margin"sv);
-	Factor = Clamp(edPtr->Props.GetPropertyNum("Factor"sv), 0, 100);
+	Divisor = edPtr->Props.GetPropertyNum(0);
+	Margin = edPtr->Props.GetPropertyNum(1);
+	Factor = Clamp(edPtr->Props.GetPropertyNum(2), 0, 100);
 
-	CenterDisplay = edPtr->Props.IsPropChecked("Auto Center Display"sv);
-	Easing = edPtr->Props.IsPropChecked("Easing"sv);
-	HoriScrolling = edPtr->Props.IsPropChecked("Horizontal Scrolling"sv);
-	VertScrolling = edPtr->Props.IsPropChecked("Vertical Scrolling"sv);
-	Peytonphile = edPtr->Props.IsPropChecked("Peytonphile Scrolling"sv);
+	CenterDisplay = edPtr->Props.IsPropChecked(3);
+	Easing = edPtr->Props.IsPropChecked(4);
+	HoriScrolling = edPtr->Props.IsPropChecked(5);
+	VertScrolling = edPtr->Props.IsPropChecked(6);
+	Peytonphile = edPtr->Props.IsPropChecked(7);
 
-	HoriFlipped = edPtr->Props.IsPropChecked("Input Flipped Horizontally"sv);
-	VertFlipped = edPtr->Props.IsPropChecked("Input Flipped Vertically"sv);
+	HoriFlipped = edPtr->Props.IsPropChecked(8);
+	VertFlipped = edPtr->Props.IsPropChecked(9);
+
+#if __ANDROID__
+	IgnoreLast = edPtr->Props.IsPropChecked(10);
+#endif
 
 	_marginMiddleX = _marginMiddleY =
 	_dt = _xSpeed = _ySpeed = 0;
@@ -196,7 +201,13 @@ REFLAG Extension::Handle()
 
 	_dt = GetDelta();
 
-	if (!Peytonphile)
+	int androidTap = true;
+#if __ANDROID__
+	if (IgnoreLast && !IsTapped())
+		androidTap = false;
+#endif
+
+	if (!Peytonphile && androidTap)
 	{
 		_marginMiddleX = Clamp(Clamp(GetMouseX(), GetFrameLeft(), GetFrameRight()) - GetFrameLeft(), ((_resX / 2) - (Margin / 2)), ((_resX / 2) + (Margin / 2)));
 		_marginMiddleY = Clamp(Clamp(GetMouseY(), GetFrameTop(), GetFrameBottom()) - GetFrameTop(), ((_resY / 2) - (Margin / 2)), ((_resY / 2) + (Margin / 2)));
@@ -204,13 +215,13 @@ REFLAG Extension::Handle()
 		_ySpeed = 0;
 	}
 
-	if (!_dontScroll && HoriScrolling && !Peytonphile)
+	if (!_dontScroll && androidTap && HoriScrolling && !Peytonphile)
 	{
 		_xSpeed = ((Clamp(GetMouseX(), GetFrameLeft(), GetFrameRight()) - GetFrameLeft()) - _marginMiddleX) / Divisor;
 		_scrollingXTarget = Clamp((_scrollingXTarget + (_xSpeed * _dt)), (_resX / 2), (GetVirtualWidth() - (_resX / 2)));
 	}
 
-	if (!_dontScroll && VertScrolling && !Peytonphile)
+	if (!_dontScroll && androidTap && VertScrolling && !Peytonphile)
 	{
 		_ySpeed = ((Clamp(GetMouseY(), GetFrameTop(), GetFrameBottom()) - GetFrameTop()) - _marginMiddleY) / (Divisor + 0.0f) * ((_resX + 0.0f) / _resY);
 		_scrollingYTarget = Clamp((_scrollingYTarget + (_ySpeed * _dt)), (_resY / 2), (GetVirtualHeight() - (_resY / 2)));
@@ -244,7 +255,7 @@ REFLAG Extension::Handle()
 			SetFrameCenterY(_scrollingY);
 	}
 
-	if (Peytonphile)
+	if (Peytonphile && androidTap)
 	{
 		_xSpeed = 0;
 		_ySpeed = 0;
@@ -315,8 +326,45 @@ int Extension::GetFrameRight()
 	r += rhPtr->rh3.WindowSx;
 	if (r > rhPtr->LevelSx)
 		r = rhPtr->LevelSx;
-	return r;
+#elif __ANDROID__
+	jfieldID _fid_rhWindowX = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rhWindowX", "I");
+	JNIExceptionCheck();
+	int rhWindowX = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rhWindowX);
+	JNIExceptionCheck();
+
+	jfieldID _fid_rh3Scrolling = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3Scrolling", "C");
+	JNIExceptionCheck();
+	char rh3Scrolling = mainThreadJNIEnv->GetCharField(rhPtr->crun, _fid_rh3Scrolling);
+	JNIExceptionCheck();
+
+	int r = rhWindowX;
+	if ((rh3Scrolling & 1) != 0)
+	{
+		jfieldID _fid_rh3DisplayX = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayX", "I");
+		JNIExceptionCheck();
+		int rh3DisplayX = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3DisplayX);
+		JNIExceptionCheck();
+
+		r = rh3DisplayX;
+	}
+
+	jfieldID _fid_rh3WindowSx = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3WindowSx", "I");
+	JNIExceptionCheck();
+	int rh3WindowSx = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3WindowSx);
+	JNIExceptionCheck();
+
+	r += rh3WindowSx;
+
+	jfieldID _fid_rhLevelSx = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rhLevelSx", "I");
+	JNIExceptionCheck();
+	int rhLevelSx = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rhLevelSx);
+	JNIExceptionCheck();
+
+	if (r > rhLevelSx)
+		r = rhLevelSx;
 #endif
+
+	return r;
 }
 
 int Extension::GetFrameLeft()
@@ -325,10 +373,32 @@ int Extension::GetFrameLeft()
 	int r = rhPtr->WindowX;
 	if ((rhPtr->rh3.Scrolling & RH3SCROLLING_SCROLL) != 0)
 		r = rhPtr->rh3.DisplayX;
+#elif __ANDROID__
+	jfieldID _fid_rhWindowX = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rhWindowX", "I");
+	JNIExceptionCheck();
+	int rhWindowX = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rhWindowX);
+	JNIExceptionCheck();
+
+	jfieldID _fid_rh3Scrolling = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3Scrolling", "C");
+	JNIExceptionCheck();
+	char rh3Scrolling = mainThreadJNIEnv->GetCharField(rhPtr->crun, _fid_rh3Scrolling);
+	JNIExceptionCheck();
+
+	int r = rhWindowX;
+	if ((rh3Scrolling & 1) != 0)
+	{
+		jfieldID _fid_rh3DisplayX = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayX", "I");
+		JNIExceptionCheck();
+		int rh3DisplayX = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3DisplayX);
+		JNIExceptionCheck();
+
+		r = rh3DisplayX;
+	}
+#endif
+
 	if (r < 0)
 		r = 0;
 	return r;
-#endif
 }
 
 int Extension::GetFrameBottom()
@@ -340,8 +410,45 @@ int Extension::GetFrameBottom()
 	r += rhPtr->rh3.WindowSy;
 	if (r > rhPtr->LevelSy)
 		r = rhPtr->LevelSy;
-	return r;
+#elif __ANDROID__
+	jfieldID _fid_rhWindowY = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rhWindowY", "I");
+	JNIExceptionCheck();
+	int rhWindowY = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rhWindowY);
+	JNIExceptionCheck();
+
+	jfieldID _fid_rh3Scrolling = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3Scrolling", "C");
+	JNIExceptionCheck();
+	char rh3Scrolling = mainThreadJNIEnv->GetCharField(rhPtr->crun, _fid_rh3Scrolling);
+	JNIExceptionCheck();
+
+	int r = rhWindowY;
+	if ((rh3Scrolling & 1) != 0)
+	{
+		jfieldID _fid_rh3DisplayY = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayY", "I");
+		JNIExceptionCheck();
+		int rh3DisplayY = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3DisplayY);
+		JNIExceptionCheck();
+
+		r = rh3DisplayY;
+	}
+
+	jfieldID _fid_rh3WindowSy = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3WindowSy", "I");
+	JNIExceptionCheck();
+	int rh3WindowSy = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3WindowSy);
+	JNIExceptionCheck();
+
+	r += rh3WindowSy;
+
+	jfieldID _fid_rhLevelSy = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rhLevelSy", "I");
+	JNIExceptionCheck();
+	int rhLevelSy = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rhLevelSy);
+	JNIExceptionCheck();
+
+	if (r > rhLevelSy)
+		r = rhLevelSy;
 #endif
+
+	return r;
 }
 
 int Extension::GetFrameTop()
@@ -350,10 +457,32 @@ int Extension::GetFrameTop()
 	int r = rhPtr->WindowY;
 	if ((rhPtr->rh3.Scrolling & RH3SCROLLING_SCROLL) != 0)
 		r = rhPtr->rh3.DisplayY;
+#elif __ANDROID__
+	jfieldID _fid_rhWindowY = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rhWindowY", "I");
+	JNIExceptionCheck();
+	int rhWindowY = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rhWindowY);
+	JNIExceptionCheck();
+
+	jfieldID _fid_rh3Scrolling = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3Scrolling", "C");
+	JNIExceptionCheck();
+	char rh3Scrolling = mainThreadJNIEnv->GetCharField(rhPtr->crun, _fid_rh3Scrolling);
+	JNIExceptionCheck();
+
+	int r = rhWindowY;
+	if ((rh3Scrolling & 1) != 0)
+	{
+		jfieldID _fid_rh3DisplayY = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayY", "I");
+		JNIExceptionCheck();
+		int rh3DisplayY = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3DisplayY);
+		JNIExceptionCheck();
+
+		r = rh3DisplayY;
+	}
+#endif
+
 	if (r < 0)
 		r = 0;
 	return r;
-#endif
 }
 
 void Extension::SetFrameCenterX(int centerX)
@@ -361,8 +490,21 @@ void Extension::SetFrameCenterX(int centerX)
 #ifdef _WIN32
 	centerX = Clamp(centerX - rhPtr->rh3.WindowSx / 2, 0, GetVirtualWidth() - rhPtr->rh3.WindowSx);
 	rhPtr->rh3.DisplayX = centerX;
-	Runtime.Redisplay();
+#elif __ANDROID__
+	jfieldID _fid_rh3WindowSx = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3WindowSx", "I");
+	JNIExceptionCheck();
+	int rh3WindowSx = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3WindowSx);
+	JNIExceptionCheck();
+
+	centerX = Clamp(centerX - rh3WindowSx / 2, 0, GetVirtualWidth() - rh3WindowSx);
+
+	jfieldID _fid_rh3DisplayX = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayX", "I");
+	JNIExceptionCheck();
+	mainThreadJNIEnv->SetIntField(rhPtr->crun, _fid_rh3DisplayX, centerX);
+	JNIExceptionCheck();
 #endif
+
+	Runtime.Redisplay();
 }
 
 void Extension::SetFrameCenterY(int centerY)
@@ -370,8 +512,21 @@ void Extension::SetFrameCenterY(int centerY)
 #ifdef _WIN32
 	centerY = Clamp(centerY - rhPtr->rh3.WindowSy / 2, 0, GetVirtualHeight() - rhPtr->rh3.WindowSy);
 	rhPtr->rh3.DisplayY = centerY;
-	Runtime.Redisplay();
+#elif __ANDROID__
+	jfieldID _fid_rh3WindowSy = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3WindowSy", "I");
+	JNIExceptionCheck();
+	int rh3WindowSy = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3WindowSy);
+	JNIExceptionCheck();
+
+	centerY = Clamp(centerY - rh3WindowSy / 2, 0, GetVirtualHeight() - rh3WindowSy);
+
+	jfieldID _fid_rh3DisplayY = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayY", "I");
+	JNIExceptionCheck();
+	mainThreadJNIEnv->SetIntField(rhPtr->crun, _fid_rh3DisplayY, centerY);
+	JNIExceptionCheck();
 #endif
+
+	Runtime.Redisplay();
 }
 
 double Extension::Clamp(double value, double min, double max)
@@ -390,6 +545,21 @@ int Extension::GetMouseX()
 		return (_resX - rhPtr->rh2.MouseClient.x) + rhPtr->rh3.DisplayX;
 	else
 		return rhPtr->rh2.Mouse.x;
+#elif __ANDROID__
+	jfieldID _fid_mouseX = mainThreadJNIEnv->GetFieldID(rhPtr->get_App()->meClass, "mouseX", "I");
+	JNIExceptionCheck();
+	int mouseX = mainThreadJNIEnv->GetIntField(rhPtr->get_App()->me, _fid_mouseX);
+	JNIExceptionCheck();
+
+	jfieldID _fid_rh3DisplayX = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayX", "I");
+	JNIExceptionCheck();
+	int rh3DisplayX = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3DisplayX);
+	JNIExceptionCheck();
+
+	if (HoriFlipped)
+		return (_resX - mouseX) + rh3DisplayX;
+	else
+		return mouseX + rh3DisplayX;
 #endif
 }
 
@@ -400,6 +570,21 @@ int Extension::GetMouseY()
 		return (_resY - rhPtr->rh2.MouseClient.y) + rhPtr->rh3.DisplayY;
 	else
 		return rhPtr->rh2.Mouse.y;
+#elif __ANDROID__
+	jfieldID _fid_mouseY = mainThreadJNIEnv->GetFieldID(rhPtr->get_App()->meClass, "mouseY", "I");
+	JNIExceptionCheck();
+	int mouseY = mainThreadJNIEnv->GetIntField(rhPtr->get_App()->me, _fid_mouseY);
+	JNIExceptionCheck();
+
+	jfieldID _fid_rh3DisplayY = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayY", "I");
+	JNIExceptionCheck();
+	int rh3DisplayY = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3DisplayY);
+	JNIExceptionCheck();
+
+	if (VertFlipped)
+		return (_resY - mouseY) + rh3DisplayY;
+	else
+		return mouseY + rh3DisplayY;
 #endif
 }
 
@@ -407,6 +592,12 @@ double Extension::GetDelta()
 {
 #ifdef _WIN32
 	return rhPtr->rh4.mvtTimerCoef;
+#elif __ANDROID__
+	jfieldID _fid_rh4MvtTimerCoef = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh4MvtTimerCoef", "D");
+	JNIExceptionCheck();
+	double rh4MvtTimerCoef = mainThreadJNIEnv->GetDoubleField(rhPtr->crun, _fid_rh4MvtTimerCoef);
+	JNIExceptionCheck();
+	return rh4MvtTimerCoef;
 #endif
 }
 
@@ -414,6 +605,17 @@ int Extension::GetVirtualWidth()
 {
 #ifdef _WIN32
 	return rhPtr->Frame->VirtualRect.right;
+#elif __ANDROID__
+	CRunFrame* frame = rhPtr->get_App()->get_Frame();
+	jfieldID _fid_leVirtualRect = mainThreadJNIEnv->GetFieldID(frame->meClass, "leVirtualRect", "LServices/CRect;");
+	JNIExceptionCheck();
+	jobject leVirtualRect = mainThreadJNIEnv->GetObjectField(frame->me, _fid_leVirtualRect);
+	JNIExceptionCheck();
+	jfieldID _fid_right = mainThreadJNIEnv->GetFieldID(crectClass, "right", "I");
+	JNIExceptionCheck();
+	int right = mainThreadJNIEnv->GetIntField(leVirtualRect, _fid_right);
+	JNIExceptionCheck();
+	return right;
 #endif
 }
 
@@ -421,5 +623,23 @@ int Extension::GetVirtualHeight()
 {
 #ifdef _WIN32
 	return rhPtr->Frame->VirtualRect.bottom;
+#elif __ANDROID__
+	CRunFrame* frame = rhPtr->get_App()->get_Frame();
+	jfieldID _fid_leVirtualRect = mainThreadJNIEnv->GetFieldID(frame->meClass, "leVirtualRect", "LServices/CRect;");
+	JNIExceptionCheck();
+	jobject leVirtualRect = mainThreadJNIEnv->GetObjectField(frame->me, _fid_leVirtualRect);
+	JNIExceptionCheck();
+	jfieldID _fid_bottom = mainThreadJNIEnv->GetFieldID(crectClass, "bottom", "I");
+	JNIExceptionCheck();
+	int bottom = mainThreadJNIEnv->GetIntField(leVirtualRect, _fid_bottom);
+	JNIExceptionCheck();
+	return bottom;
 #endif
 }
+
+#if __ANDROID__
+bool Extension::IsTapped()
+{
+	return AndroidMMFRuntime::get(&Runtime)->get_TouchManager()->anyTouchDown();
+}
+#endif

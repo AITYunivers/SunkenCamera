@@ -9,6 +9,7 @@ public:
 	RunObjectMultiPlatPtr rdPtr; // you should not need to access this
 #ifdef __ANDROID__
 	global<jobject> javaExtPtr;
+	global<jclass> crectClass;
 #elif defined(__APPLE__)
 	void* const objCExtPtr;
 #endif
@@ -16,7 +17,7 @@ public:
 	Edif::Runtime Runtime;
 
 	static const int MinimumBuild = 254;
-	static const int Version = 2;
+	static const int Version = 3;
 
 	// If you change OEFLAGS, make sure you modify RUNDATA so the data is available, or you'll get crashes!
 	// For example, OEFLAGS::VALUES makes use of the AltVals rv struct.
@@ -60,6 +61,10 @@ public:
 	bool HoriFlipped;
 	bool VertFlipped;
 
+#if __ANDROID__
+	bool IgnoreLast;
+#endif
+
 	float _scrollingX;
 	float _scrollingY;
 	float _scrollingXTarget;
@@ -91,6 +96,10 @@ public:
 
 	int GetVirtualWidth();
 	int GetVirtualHeight();
+
+#if __ANDROID__
+	bool IsTapped();
+#endif
 
 	/*  Add your actions, conditions and expressions as real class member
 		functions here. The arguments (and return type for expressions) must

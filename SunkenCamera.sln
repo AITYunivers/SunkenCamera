@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HTML5", "HTML5", "{8A5D0AFE
 		HTML5\SunkenCamera.js = HTML5\SunkenCamera.js
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SunkenCamera.Android", "SunkenCamera.Android.vcxproj", "{F188C581-6CE9-49E1-856A-22E99732215B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Unicode|ARM = Debug Unicode|ARM
@@ -124,6 +126,78 @@ Global
 		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Vitalize|Win32.Build.0 = Debug|Win32
 		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Vitalize|x64.ActiveCfg = Debug|Win32
 		{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}.Vitalize|x64.Build.0 = Debug|Win32
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug Unicode|ARM.ActiveCfg = Debug|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug Unicode|ARM.Build.0 = Debug|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug Unicode|ARM64.ActiveCfg = Debug|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug Unicode|ARM64.Build.0 = Debug|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug Unicode|Win32.ActiveCfg = Debug|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug Unicode|Win32.Build.0 = Debug|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug Unicode|x64.ActiveCfg = Debug|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug Unicode|x64.Build.0 = Debug|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug|ARM.ActiveCfg = Debug|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug|ARM.Build.0 = Debug|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug|ARM64.Build.0 = Debug|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug|Win32.ActiveCfg = Debug|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug|Win32.Build.0 = Debug|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug|x64.ActiveCfg = Debug|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Debug|x64.Build.0 = Debug|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime French|ARM.ActiveCfg = Runtime|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime French|ARM.Build.0 = Runtime|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime French|ARM64.ActiveCfg = Runtime|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime French|ARM64.Build.0 = Runtime|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime French|Win32.ActiveCfg = Runtime|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime French|Win32.Build.0 = Runtime|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime French|x64.ActiveCfg = Runtime|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime French|x64.Build.0 = Runtime|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime Unicode|ARM.ActiveCfg = Runtime|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime Unicode|ARM.Build.0 = Runtime|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime Unicode|ARM64.ActiveCfg = Runtime|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime Unicode|ARM64.Build.0 = Runtime|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime Unicode|Win32.ActiveCfg = Runtime|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime Unicode|Win32.Build.0 = Runtime|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime Unicode|x64.ActiveCfg = Runtime|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime Unicode|x64.Build.0 = Runtime|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime|ARM.ActiveCfg = Runtime|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime|ARM.Build.0 = Runtime|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime|ARM64.ActiveCfg = Runtime|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime|ARM64.Build.0 = Runtime|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime|Win32.ActiveCfg = Runtime|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime|Win32.Build.0 = Runtime|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime|x64.ActiveCfg = Runtime|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Edittime|x64.Build.0 = Runtime|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime French|ARM.ActiveCfg = Runtime|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime French|ARM.Build.0 = Runtime|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime French|ARM64.ActiveCfg = Runtime|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime French|ARM64.Build.0 = Runtime|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime French|Win32.ActiveCfg = Runtime|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime French|Win32.Build.0 = Runtime|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime French|x64.ActiveCfg = Runtime|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime French|x64.Build.0 = Runtime|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime Unicode|ARM.ActiveCfg = Runtime|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime Unicode|ARM.Build.0 = Runtime|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime Unicode|ARM64.ActiveCfg = Runtime|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime Unicode|ARM64.Build.0 = Runtime|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime Unicode|Win32.ActiveCfg = Runtime|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime Unicode|Win32.Build.0 = Runtime|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime Unicode|x64.ActiveCfg = Runtime|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime Unicode|x64.Build.0 = Runtime|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime|ARM.ActiveCfg = Runtime|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime|ARM.Build.0 = Runtime|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime|ARM64.ActiveCfg = Runtime|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime|ARM64.Build.0 = Runtime|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime|Win32.ActiveCfg = Runtime|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime|Win32.Build.0 = Runtime|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime|x64.ActiveCfg = Runtime|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Runtime|x64.Build.0 = Runtime|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Vitalize|ARM.ActiveCfg = Runtime|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Vitalize|ARM.Build.0 = Runtime|ARM
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Vitalize|ARM64.ActiveCfg = Runtime|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Vitalize|ARM64.Build.0 = Runtime|ARM64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Vitalize|Win32.ActiveCfg = Runtime|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Vitalize|Win32.Build.0 = Runtime|x86
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Vitalize|x64.ActiveCfg = Runtime|x64
+		{F188C581-6CE9-49E1-856A-22E99732215B}.Vitalize|x64.Build.0 = Runtime|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -134,5 +208,6 @@ Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		SunkenCamera.Shared.vcxitems*{29c98f64-7cc6-4aca-9f50-fe5f99fca85d}*SharedItemsImports = 4
 		SunkenCamera.Shared.vcxitems*{633109e6-84fe-4b06-b91b-994bc389ad34}*SharedItemsImports = 9
+		SunkenCamera.Shared.vcxitems*{f188c581-6ce9-49e1-856a-22e99732215b}*SharedItemsImports = 4
 	EndGlobalSection
 EndGlobal

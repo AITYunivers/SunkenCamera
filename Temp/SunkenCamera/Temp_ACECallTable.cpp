@@ -1,4 +1,4 @@
-﻿// DarkEdifPreBuildTool: This file was generated for a Extension.cpp/h that was modified at 2024-05-09T03:27:15.9097296Z.
+﻿// DarkEdifPreBuildTool: This file was generated for a Extension.cpp/h that was modified at 2024-11-14T07:43:37.9785473Z.
 // This file is used by the DarkEdifPreBuildTool as an input template for the calltable generator.
 // Do not modify or delete this file.
 #if DARKEDIF_ACE_CALL_TABLE_INDEX==0
@@ -14,6 +14,10 @@
 				return ext->CheckVertScrolling();
 			case 4:
 				return ext->CheckPeytonphile();
+			case 6:
+				return ext->CheckHoriFlipped();
+			case 7:
+				return ext->CheckVertFlipped();
 
 #elif DARKEDIF_ACE_CALL_TABLE_INDEX==1
 			case 0:
@@ -34,6 +38,18 @@
 				return ext->SetVertScrolling(*(int *)&Parameters[0]), 0;
 			case 7:
 				return ext->SetPeytonphile(*(int *)&Parameters[0]), 0;
+			case 9:
+				return ext->SetCameraPosX(*(float *)&Parameters[0]), 0;
+			case 10:
+				return ext->SetCameraPosY(*(float *)&Parameters[0]), 0;
+			case 11:
+				return ext->SetCameraTargetX(*(float *)&Parameters[0]), 0;
+			case 12:
+				return ext->SetCameraTargetY(*(float *)&Parameters[0]), 0;
+			case 13:
+				return ext->FlipHorizontally(), 0;
+			case 14:
+				return ext->FlipVertically(), 0;
 
 #elif DARKEDIF_ACE_CALL_TABLE_INDEX==2
 		case 0:
