@@ -27,7 +27,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{29C98F64-7CC6-4ACA-9F50-FE5F99FCA85D}</ProjectGuid>
+    <ProjectGuid>{b31ccf38-91a5-4c6e-9e13-bca9fb86385c}</ProjectGuid>
     <ProjectName>SunkenCamera.Windows</ProjectName>
     <TargetName>SunkenCamera</TargetName>
   </PropertyGroup>
@@ -67,9 +67,34 @@
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>FUSION_INTERNAL_ACCESS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Edittime|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>FUSION_INTERNAL_ACCESS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>FUSION_INTERNAL_ACCESS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Edittime Unicode|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>FUSION_INTERNAL_ACCESS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Runtime|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>FUSION_INTERNAL_ACCESS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Runtime Unicode|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>FUSION_INTERNAL_ACCESS;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -78,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Inc\Windows\Props.hpp" />
+    <ClInclude Include="..\Inc\Windows\WindowsSurface.hpp" />
     <ClInclude Include="..\Inc\Windows\WindowsDefines.hpp" />
     <ClInclude Include="DarkExt.json">
       <FileType>Document</FileType>

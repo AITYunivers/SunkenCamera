@@ -1,5 +1,5 @@
-/*
-	This DarkEdif Template Fusion extension HTML5 port is under MIT license.
+﻿/*
+	This SunkenCamera Fusion extension HTML5 port is under MIT license.
 
 	Modification for purposes of tuning to your own HTML5 application is permitted, but must retain this notice and not be redistributed,
 	outside of its (hopefully minified) presence inside your HTML5 website's source code.
@@ -14,7 +14,7 @@
 // Global data, including sub-applications, just how God intended.
 // Note: This will allow newer SDK versions in later SDKs to take over.
 // We need this[] and globalThis[] instead of direct because HTML5 Final Project minifies and breaks the names otherwise
-globalThis['darkEdif'] = (globalThis['darkEdif'] && globalThis['darkEdif'].sdkVersion >= 19) ? globalThis['darkEdif'] :
+globalThis['darkEdif'] = (globalThis['darkEdif'] && globalThis['darkEdif'].sdkVersion >= 20) ? globalThis['darkEdif'] :
 	new (/** @constructor */ function() {
 	// window variable is converted into __scope for some reason, so globalThis it is.
 	this.data = {};
@@ -33,9 +33,9 @@ globalThis['darkEdif'] = (globalThis['darkEdif'] && globalThis['darkEdif'].sdkVe
 	this.getCurrentFusionEventNumber = function (ext) {
 		return ext.rh.rhEvtProg.rhEventGroup.evgLine || -1;
 	};
-	this.sdkVersion = 19;
+	this.sdkVersion = 20;
 	this.checkSupportsSDKVersion = function (sdkVer) {
-		if (sdkVer < 16 || sdkVer > 19) {
+		if (sdkVer < 16 || sdkVer > 20) {
 			throw "HTML5 DarkEdif SDK does not support SDK version " + this.sdkVersion;
 		}
 	};
@@ -83,26 +83,135 @@ globalThis['darkEdif'] = (globalThis['darkEdif'] && globalThis['darkEdif'].sdkVe
 		}
 		// DarkEdif SDK header read:
 		// header uint32, hash uint32, hashtypes uint32, numprops uint16, pad uint16, sizeBytes uint32 (includes whole EDITDATA)
+		// if prop set v2, then uint64 editor checkbox ptr
 		// then checkbox list, one bit per checkbox, including non-checkbox properties
 		// so skip numProps / 8 bytes
 		// then moving to Data list:
 		// size uint32 (includes whole Data), propType uint16, propNameSize uint8, propname u8 (lowercased), then data bytes
 
-		let header = new Uint8Array(edPtrFile.readBuffer(4 + 4 + 4 + 2 + 2 + 4));
-		if (String.fromCharCode.apply('', [header[3], header[2], header[1], header[0]]) != 'DAR1') {
-			throw "Did you read this.ho.privateData bytes?";
+		let bytes = edPtrFile.ccfBytes.slice(edPtrFile.pointer);
+		
+		edPtrFile.skipBytes(ext.ho.privateData - 20); // sub size of eHeader; edPtrFile won't start with eHeader
+		const verBuff = new Uint8Array(edPtrFile.readBuffer(4));
+		const verStr = String.fromCharCode.apply('', verBuff.reverse());
+		let propVer;
+		if (verStr == 'DAR2') {
+			propVer = 2;
+		} else if (verStr == 'DAR1') {
+			propVer = 1;
+		} else {
+			throw "Version string " + verStr + " unknown. Did you restore the file offset?";
 		}
-
+		// Pull out hash, hashTypes, numProps, pad, sizeBytes, visibleEditorProps
+		let header = new Uint8Array(edPtrFile.readBuffer(4 + 4 + 2 + 2 + 4 + (propVer > 1 ? 8 : 0)));
 		let headerDV = new DataView(header.buffer);
-		this.numProps = headerDV.getUint16(4 + 4 + 4, true); // Skip past hash and hashTypes
-		this.sizeBytes = headerDV.getUint32(4 + 4 + 4 + 4, true); // skip past numProps and pad
+		this.numProps = headerDV.getUint16(4 + 4, true); // Skip past hash and hashTypes
+		this.sizeBytes = headerDV.getUint32(4 + 4 + 4, true); // skip past numProps and pad
 
-		let editData = edPtrFile.readBuffer(this.sizeBytes - header.byteLength);
+		let editData = edPtrFile.readBuffer(
+			this.sizeBytes -
+			// skip area between eHeader -> Props
+			(ext.ho.privateData - 20) -
+			// Skip DarkEdif header
+			header.byteLength
+		);
 		this.chkboxes = editData.slice(0, Math.ceil(this.numProps / 8));
 		let that = this;
+		let IsComboBoxProp = function(propTypeID) {
+			// PROPTYPE_COMBOBOX, PROPTYPE_COMBOBOXBTN, PROPTYPE_ICONCOMBOBOX
+			return propTypeID == 7 || propTypeID == 20 || propTypeID == 24;
+		};
+		let RuntimePropSet = function(data) {
+			let rsDV = new DataView(data.propData.buffer);
+			let rs = /* RuntimePropSet */ { 
+				// Always 'S', compared with 'L' for non-set list.
+				setIndicator: String.fromCharCode(rsDV.getUint8(0)),
+				// Number of repeats of this set, 1 is minimum and means one of this set
+				numRepeats: rsDV.getUint16(1, true),
+				// Property that ends this set's data, as a JSON index, inclusive
+				lastSetJSONPropIndex: rsDV.getUint16(1 + 2, true),
+				// First property that begins this set's data, as a JSON index
+				firstSetJSONPropIndex: rsDV.getUint16(1 + (2 * 2), true),
+				// Name property JSON index that will appear in list when switching set entry
+				setNameJSONPropIndex: rsDV.getUint16(1 + (2 * 3), true),
+				// Current set index selected (0+), present at runtime too, but not used there
+				getIndexSelected: function() {
+					return rsDV.getUint16(1 + (2 * 4), true);
+				},
+				setIndexSelected: function(i) {
+					rsDV.setUint16(1 + (2 * 4), i, true);
+				},
+				// Set name, as specified in JSON. Don't confuse with user-specified set name.
+				setName: that.textDecoder.decode(data.propData.slice(1 + (2 * 5))),
+			};
+			if (rs.setIndicator != 'S')
+				throw "Not a prop set!";
+			return rs;
+		};
 		let GetPropertyIndex = function(chkIDOrName) {
+			if (propVer > 1) {
+				let jsonIdx = -1;
+				if (typeof chkIDOrName == 'number') {
+					const p = that.props.find(function(p) { return p.index == chkIDOrName; });
+					if (p == null) {
+						throw "Invalid property name \"" + chkIDOrName + "\"";
+					}
+					jsonIdx = p.propJSONIndex;
+				} else {
+					const p = that.props.find(function(p) { return p.propName == chkIDOrName; });
+					if (p == null) {
+						throw "Invalid property name \"" + chkIDOrName + "\"";
+					}
+					jsonIdx = p.propJSONIndex;
+				}
+				// Look up prop index from JSON index - DarkEdif::Properties::PropIdxFromJSONIdx
+				let data = that.props[0], i = 0;
+				while (data.propJSONIndex != jsonIdx) {
+					if (i >= that.numProps) {
+						throw "Couldn't find property of JSON ID " + jsonIdx + ", hit property " + i + " of " + that.numProps + " stored.\n";
+					}
+					if (IsComboBoxProp(data.propTypeID) && String.fromCharCode(data.propData[0]) == 'S') {
+						let rs = new RuntimePropSet(data);
+						let rsContainer = data;
+						// We're beyond all of this set's JSON range: skip past all repeats
+						if (jsonIdx > rs.lastSetJSONPropIndex) {
+							while (data.propJSONIndex != rs.lastSetJSONPropIndex) {
+								data = that.props[i++];
+							}
+							rs = rsContainer = null;
+						}
+						// It's within this set's range
+						else if (jsonIdx >= rs.firstSetJSONPropIndex && jsonIdx <= rs.lastSetJSONPropIndex) {
+							if (rs.getIndexSelected() > 0) {
+								for (let j = 0; ;) {
+									data = that.props[++i];
+									
+									// Skip until end of this entry, then move to next prop
+									if (data.propJSONIndex == rs.lastSetJSONPropIndex) {
+										if (++j == rs.getIndexSelected()) {
+											data = that.props[++i];
+											break;
+										}
+									}
+								}
+								continue;
+							} else {
+								data = that.props[++i];
+								continue;
+							}
+						}
+						// else it's not in this set: continue to standard loop
+						else {
+							rs = rsContainer = null;
+						}
+					}
+					
+					data = that.props[++i];
+				}
+				return data.index;
+			}
 			if (typeof chkIDOrName == 'number') {
-				if (that.numProps >= chkIDOrName) {
+				if (that.numProps <= chkIDOrName) {
 					throw "Invalid property ID " + chkIDOrName + ", max ID is " + (that.numProps - 1) + ".";
 				}
 				return chkIDOrName;
@@ -132,11 +241,18 @@ globalThis['darkEdif'] = (globalThis['darkEdif'] && globalThis['darkEdif'].sdkVe
 				16, // PROPTYPE_FILENAME:
 				19, // PROPTYPE_PICTUREFILENAME:
 				26, // PROPTYPE_DIRECTORYNAME:
-				7, // PROPTYPE_COMBOBOX:
-				20, // PROPTYPE_COMBOBOXBTN:
-				24 // PROPTYPE_ICONCOMBOBOX:
 			];
-			if (textPropIDs.indexOf(prop.propTypeID) != -1) {
+			if (textPropIDs.indexOf(prop.propTypeID) != -1 || IsComboBoxProp(prop.propTypeID)) {
+				// Prop ver 2 added repeating prop sets
+				if (propVer == 2 && IsComboBoxProp(prop.propTypeID)) {
+					const setIndicator = String.fromCharCode(prop.propData[0]);
+					if (setIndicator == 'L') {
+						return that.textDecoder.decode(prop.propData.slice(1));
+					} else if (setIndicator == 'S') {
+						throw "Property " + prop.propName + " is not textual.";
+					}
+					throw "Property " + prop.propName + " is not a valid list property.";
+				}
 				let t = that.textDecoder.decode(prop.propData);
 				if (prop.propTypeID == 22) { //PROPTYPE_EDIT_MULTILINE
 					t = t.replaceAll('\r', ''); // CRLF to LF
@@ -170,6 +286,87 @@ globalThis['darkEdif'] = (globalThis['darkEdif'] && globalThis['darkEdif'].sdkVe
 			}
 			throw "Property " + prop.propName + " is not numeric.";
 		};
+		this['GetPropertyImageID'] = function(chkIDOrName, imgID) {
+			const idx = GetPropertyIndex(chkIDOrName);
+			if (idx == -1) {
+				return -1;
+			}
+			const prop = that.props[idx];
+			if (prop.propTypeID != 23) { // PROPTYPE_IMAGELIST
+				throw "Property " + prop.propName + " is not an image list.";
+			}
+			
+			if ((~~imgID != imgID) || imgID < 0) {
+				throw "Image index " + imgID + " is invalid.";
+			}
+			const dv = new DataView(prop.propData.buffer);
+			if (imgID >= dv.getUint16(0, true)) {
+				return -1;
+			}
+			
+			return imgID.getUint16(2 * (1 + idx), true)
+		};
+		this['GetPropertyNumImages'] = function(chkIDOrName, imgID) {
+			const idx = GetPropertyIndex(chkIDOrName);
+			if (idx == -1) {
+				return -1;
+			}
+			const prop = that.props[idx];
+			if (prop.propTypeID != 23) { // PROPTYPE_IMAGELIST
+				throw "Property " + prop.propName + " is not an image list.";
+			}
+			
+			return new DataView(prop.propData.buffer).getUint16(0, true);
+		};
+		this['GetSizeProperty'] = function(chkIDOrName) {
+			const idx = GetPropertyIndex(chkIDOrName);
+			if (idx == -1) {
+				return -1;
+			}
+			const prop = that.props[idx];
+			if (prop.propTypeID != 8) { // PROPTYPE_SIZE
+				throw "Property " + prop.propName + " is not an size property.";
+			}
+			
+			const dv = new DataView(prop.propData.buffer);
+			return { width: dv.getInt32(0, true), height: dv.getInt32(4, true) };
+		};
+
+		this['PropSetIterator'] = this.PropSetIterator = function(nameListJSONIdx, numSkippedSetsBefore, runSetEntry, props) {
+			this.nameListJSONIdx = nameListJSONIdx;
+			this.numSkippedSetsBefore = numSkippedSetsBefore;
+			this.props = that.props;
+			this.runSetEntry = runSetEntry;
+			
+			this.runPropSet = new RuntimePropSet(runSetEntry);
+			this.runPropSet.setIndexSelected(0);
+			this.firstIt = true;
+			let thatToo = this;
+			this.next = function() {
+				// next() is called for first iterator
+				if (thatToo.firstIt) {
+					thatToo.firstIt = false;
+				} else {
+					thatToo.runPropSet.setIndexSelected(thatToo.runPropSet.getIndexSelected() + 1);
+				}
+				return {
+					value: thatToo.runPropSet.getIndexSelected(),
+					done: thatToo.runPropSet.getIndexSelected() >= thatToo.runPropSet.numRepeats
+				};
+			};
+			this[Symbol.iterator] = function () { return this; };
+		};
+		this['LoopPropSet'] = this.LoopPropSet = function(setName, numSkips = 0) {
+			let d;
+			for (let i = 0, j = 0; i < that.numProps; ++i) {
+				d = that.props[i];
+				if (IsComboBoxProp(d.propTypeID) && String.fromCharCode(d.propData[0]) == 'S') {
+					if (new RuntimePropSet(d).setName == setName && ++j > numSkips)
+						return new that.PropSetIterator(i, j - 1, d, this);
+				}
+			}
+			throw "No set found with name " + setName + ".";
+		}
 
 		this.props = [];
 		const data = editData.slice(this.chkboxes.length);
@@ -191,16 +388,97 @@ globalThis['darkEdif'] = (globalThis['darkEdif'] && globalThis['darkEdif'].sdkVe
 		for (let i = 0, pt = 0, propSize, propEnd; i < this.numProps; ++i) {
 			propSize = dataDV.getUint32(pt, true);
 			propEnd = pt + propSize;
-			const propTypeID = dataDV.getUint16(pt + 4, true);
-			const propNameLength = dataDV.getUint8(pt + 4 + 2);
-			pt += 4 + 2 + 1;
+			pt += 4;
+			const propTypeID = dataDV.getUint16(pt, true);
+			pt += 2;
+			// propJSONIndex does not exist in Data in DarkEdif smart props ver 1, so JSON index is same as prop index
+			let propJSONIndex = i;
+			if (propVer == 2) {
+				propJSONIndex = dataDV.getUint16(pt, true);
+				pt += 2;
+			}
+			const propNameLength = dataDV.getUint8(pt);
+			pt += 1;
 			const propName = this.textDecoder.decode(new Uint8Array(data.slice(pt, pt + propNameLength)));
 			pt += propNameLength;
-			const propData = new Uint8Array(data.slice(pt, pt + propSize - (4 + 2 + 1 + propNameLength)));
+			const propData = new Uint8Array(data.slice(pt, propEnd));
 
-			this.props.push({ index: i, propTypeID: propTypeID, propName: propName, propData: propData });
+			this.props.push({ index: i, propTypeID: propTypeID, propJSONIndex: propJSONIndex, propName: propName, propData: propData });
 			pt = propEnd;
 		}
+	};
+	this['Surface'] = function(rhPtr, needBitmapFuncs, needTextFuncs, width, height, alpha) {
+		if (rhPtr == null || needBitmapFuncs == null || needTextFuncs == null || width == null || height == null || alpha == null)
+			throw "Invalid Surface ctor arguments";
+		this.rhPtr = rhPtr;
+		this.hasGeometryCapacity = needBitmapFuncs;
+		this.hasTextCapacity = needTextFuncs;
+		this.canvas = document.createElement("canvas");
+		this.context = this.canvas.getContext("2d");
+		this.altered = false;
+		this.canvas.width = width;
+		this.canvas.height = height;
+		this.mosaic = 0;
+		this.xSpot = this.ySpot = 0;
+		
+		let surf = this;
+		this.faux = { img: surf.canvas, mosaic: 0, xSpot: 0, ySpot: 0 };
+		this['FillImageWith'] = function(sf) {
+			if (sf.fillType == darkEdif['SurfaceFill']['FillType']['Flat']) {
+				surf.context.rect(0, 0, surf.canvas.width, surf.canvas.height);
+				surf.context.fillStyle = sf.color;
+				surf.context.fill();
+				this.altered = true;
+				return true;
+			}
+		};
+		this['GetAndResetAltered'] = function() {
+			if (!this.altered) {
+				return false;
+			}
+			this.altered = false;
+			return true;
+		}
+		this.ext = null;
+		this['SetAsExtensionDisplay'] = function(ext) {
+			surf.ext = ext;
+		};
+		this['BlitToFrameWithExtEffects'] = function(renderer, pt) {
+			const x = this.ext.ho.hoX + (pt ? pt.x : 0),
+				y = this.ext.ho.hoY + (pt ? pt.y : 0);
+			let angle = 0, scaleX = 1, scaleY = 1, inkEffect = 1, inkEffectParam = 0;
+			if ((this.ext.ho.hoOEFlags & CObjectCommon.OEFLAG_SPRITES) != 0) {
+				angle = this.ext.ho.roc.rcAngle;
+				scaleX = this.ext.ho.roc.rcScaleX;
+				scaleY = this.ext.ho.roc.rcScaleY;
+				inkEffect = this.ext.ho.ros.rsEffect;
+				inkEffectParam = this.ext.ho.ros.rsEffectParam;
+				this.faux.xSpot = this.ext.ho.hoImgXSpot;
+				this.faux.ySpot = this.ext.ho.hoImgYSpot;
+			}
+			
+			surf.context.save();
+			renderer._context.save();
+			renderer.renderImage(this.faux, x, y, angle, scaleX, scaleY, inkEffect, inkEffectParam);
+			renderer._context.restore();
+			surf.context.restore();
+		};
+		this.img = surf.canvas;
+		
+		return this;
+	};
+	this['SurfaceFill'] = {
+		'FillType': {
+			'Flat': 0
+		},
+		'Solid': function(color) {
+			this.fillType = darkEdif['SurfaceFill']['FillType']['Flat'];
+			this.color = color;
+			return this;
+		}
+	};
+	this['ColorRGB'] = function(r,g,b) {
+		return `rgba(${r}, ${g}, ${b}, 1.0)`;
 	};
 })();
 
@@ -210,10 +488,10 @@ function CRunSunkenCamera() {
 
 	// DarkEdif SDK exts should have these four variables defined.
 	// We need this[] and globalThis[] instead of direct because HTML5 Final Project minifies and breaks the names otherwise
-	this['ExtensionVersion'] = 3; // To match C++ version
-	this['SDKVersion'] = 19; // To match C++ version
-	this['DebugMode'] = false;
-	this['ExtensionName'] = 'Sunken Camera';
+	this['ExtensionVersion'] = 1; // To match C++ version
+	this['SDKVersion'] = 20; // To match C++ version
+	this['DebugMode'] = true;
+	this['ExtensionName'] = 'SunkenCamera';
 
 	// Can't find DarkEdif wrapper
 	if (!globalThis.hasOwnProperty('darkEdif')) {
@@ -224,112 +502,29 @@ function CRunSunkenCamera() {
 	// ======================================================================================================
 	// Actions
 	// ======================================================================================================
-	this.Action_SetDivisor = function (divisor) {
-		this.Divisor = divisor;
+	this.Action_ActionExample = function (ExampleParameter) {
+		// nothing, as C++ does nothing
 	};
-	this.Action_SetMargin = function (margin) {
-		this.Margin = margin;
-	};
-	this.Action_SetFactor = function (factor) {
-		this.Factor = this.Clamp(factor, 0, 100);
-	};
-	this.Action_SetDisallowScrolling = function (setting) {
-		this._dontScroll = setting != 0;
-	};
-	this.Action_SetCenterDisplay = function (setting) {
-		this.CenterDisplay = setting != 0;
-	};
-	this.Action_SetHoriScrolling = function (setting) {
-		this.HoriScrolling = setting != 0;
-	};
-	this.Action_SetVertScrolling = function (setting) {
-		this.VertScrolling = setting != 0;
-	};
-	this.Action_SetEasing = function (setting) {
-		this.Easing = setting != 0;
-	};
-	this.Action_SetPeytonphile = function (setting) {
-		this.Peytonphile = setting != 0;
-	};
-	this.Action_SetCameraPosX = function (cameraX) {
-		this._scrollingX = cameraX;
-		this._scrollingXTarget = cameraX;
-	};
-	this.Action_SetCameraPosY = function (cameraY) {
-		this._scrollingY = cameraY;
-		this._scrollingYTarget = cameraY;
-	};
-	this.Action_SetCameraTargetX = function (cameraX) {
-		this._scrollingXTarget = cameraX;
-	};
-	this.Action_SetCameraTargetY = function (cameraY) {
-		this._scrollingYTarget = cameraY;
-	};
-	this.Action_FlipHorizontally = function () {
-		this.HoriFlipped = !this.HoriFlipped;
-	};
-	this.Action_FlipVertically = function () {
-		this.VertFlipped = !this.VertFlipped;
+	this.Action_SecondActionExample = function () {
+		// nothing, as C++ does nothing
 	};
 
 	// ======================================================================================================
 	// Conditions
 	// ======================================================================================================
-	this.Condition_CheckDisallowScrolling = function () {
-		return _dontScroll;
-	};
-	this.Condition_CheckCenterDisplay = function () {
-		return CenterDisplay;
-	};
-	this.Condition_CheckEasing = function () {
-		return Easing;
-	};
-	this.Condition_CheckHoriScrolling = function () {
-		return HoriScrolling;
-	};
-	this.Condition_CheckVertScrolling = function () {
-		return VertScrolling;
-	};
-	this.Condition_CheckPeytonphile = function () {
-		return Peytonphile;
-	};
-	this.Condition_CheckHoriFlipped = function () {
-		return HoriFlipped;
-	};
-	this.Condition_CheckVertFlipped = function () {
-		return VertFlipped;
+	this.Condition_AreTwoNumbersEqual = function (First, Second) {
+		return First == Second;
 	};
 
 	// =============================
 	// Expressions
 	// =============================
 
-	this.Expression_GetDivisor = function () {
-		return Divisor;
+	this.Expression_Add = function (First, Second) {
+		return First + Second;
 	};
-	this.Expression_GetMargin = function () {
-		return Margin;
-	};
-	this.Expression_GetFactor = function () {
-		return Factor;
-	};
-	this.Expression_GetXScroll = function () {
-		return _scrollingX;
-	};
-	this.Expression_GetYScroll = function () {
-		return _scrollingY;
-	};
-	this.Expression_GetXScrollTarget = function () {
-		return _scrollingXTarget;
-	};
-	this.Expression_GetYScrollTarget = function () {
-		return _scrollingYTarget;
-	};
-	this.Expression_GetXSpeed = function () {
-		return _xSpeed;
-	};
-	this.Expression_GetYSpeed = function () {
-		return _ySpeed;
+	this.Expression_HelloWorld = function () {
+		return "Hello world!";
 	};
 
 	// =============================
@@ -337,49 +532,17 @@ function CRunSunkenCamera() {
 	// =============================
 
 	this.$actionFuncs = [
-	/* 0  */ this.Action_SetDivisor,
-	/* 1  */ this.Action_SetMargin,
-	/* 2  */ this.Action_SetFactor,
-
-	/* 3  */ this.Action_SetDisallowScrolling,
-	/* 4  */ this.Action_SetEasing,
-	/* 5  */ this.Action_SetHoriScrolling,
-	/* 6  */ this.Action_SetVertScrolling,
-	/* 7  */ this.Action_SetPeytonphile,
-	/* 8  */ this.Action_SetCenterDisplay,
-
-	/* 9  */ this.Action_SetCameraPosX,
-	/* 10 */ this.Action_SetCameraPosY,
-	/* 11 */ this.Action_SetCameraTargetX,
-	/* 12 */ this.Action_SetCameraTargetY,
-
-	/* 13 */ this.Action_FlipHorizontally,
-	/* 14 */ this.Action_FlipVertically,
+	/* 0 */ this.Action_ActionExample,
+	/* 1 */ this.Action_SecondActionExample
 	];
-
 	this.$conditionFuncs = [
-	/* 0 */ this.Condition_CheckDisallowScrolling,
-	/* 1 */ this.Condition_CheckEasing,
-	/* 2 */ this.Condition_CheckHoriScrolling,
-	/* 3 */ this.Condition_CheckVertScrolling,
-	/* 4 */ this.Condition_CheckPeytonphile,
-	/* 5 */ this.Condition_CheckCenterDisplay,
+	/* 0 */ this.Condition_AreTwoNumbersEqual
 
-	/* 6 */ this.Condition_CheckHoriFlipped,
-	/* 7 */ this.Condition_CheckVertFlipped
+	// update getNumOfConditions function if you edit this!!!!
 	];
-
 	this.$expressionFuncs = [
-	/* 0 */ this.Expression_GetDivisor,
-	/* 1 */ this.Expression_GetMargin,
-	/* 2 */ this.Expression_GetFactor,
-
-	/* 3 */ this.Expression_GetXScroll,
-	/* 4 */ this.Expression_GetYScroll,
-	/* 5 */ this.Expression_GetXScrollTarget,
-	/* 6 */ this.Expression_GetYScrollTarget,
-	/* 7 */ this.Expression_GetXSpeed,
-	/* 8 */ this.Expression_GetYSpeed
+	/* 0 */ this.Expression_Add,
+	/* 1 */ this.Expression_HelloWorld
 	];
 }
 //
@@ -394,7 +557,7 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 	getNumberOfConditions: function() {
 		/// <summary> Returns the number of conditions </summary>
 		/// <returns type="Number" isInteger="true"> Warning, if this number is not correct, the application _will_ crash</returns>
-		return 6; // $conditionFuncs not available yet
+		return 1; // $conditionFuncs not available yet
 	},
 
 	createRunObject: function(file, cob, version) {
@@ -413,39 +576,33 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 		if (this.ho == null) {
 			throw "HeaderObject not defined when needed to be.";
 		}
-
+		
+		const origPtr = file.pointer;
+		
+		// If you want to read between eHeader and privateData, do it here
+		
+		file.pointer = origPtr;
+		
 		// DarkEdif properties are accessible as on other platforms: IsPropChecked(), GetPropertyStr(), GetPropertyNum()
 		let props = new darkEdif['Properties'](this, file, version);
 
-		this.Divisor = props['GetPropertyNum'](0);
-		this.Margin = props['GetPropertyNum'](1);
-		this.Factor = this.Clamp(props['GetPropertyNum'](2), 0, 100);
+		let str = "";
+		str += "Looping set Fred:\n";
+		for (let it of props.LoopPropSet("Fred")) {
+			str += "Set entry \"" + props.GetPropertyStr("Set name")
+				+ "\" has fruit \"" + props.GetPropertyStr("This set's fruit") + "\".\n";
+		}
+		str += "And agaiN!\n";
+		for (let it2 of props.LoopPropSet("Fred")) {
+			str += "Set entry \"" + props.GetPropertyStr("Set name")
+				+ "\" has fruit \"" + props.GetPropertyStr("This set's fruit") + "\".\n";
+		}
+		darkEdif.consoleLog(this, "DarkEdif prop notif:\n" + str + "========\n");
 
-		this.CenterDisplay = props['IsPropChecked'](3);
-		this.Easing = props['IsPropChecked'](4);
-		this.HoriScrolling = props['IsPropChecked'](5);
-		this.VertScrolling = props['IsPropChecked'](6);
-		this.Peytonphile = props['IsPropChecked'](7);
-
-		this.HoriFlipped = props['IsPropChecked'](8);
-		this.VertFlipped = props['IsPropChecked'](9);
-
-		this._marginMiddleX = this._marginMiddleY =
-		this._dt = this._xSpeed = this._ySpeed = 0;
-		this._dontScroll = false;
-
-		this._resX = this.GetFrameRight() - this.GetFrameLeft();
-		this._resY = this.GetFrameBottom() - this.GetFrameTop();
-
-		this._scrollingX = this.GetVirtualWidth() / 2;
-		this._scrollingXTarget = this._scrollingX;
-		if (this.CenterDisplay)
-			this.SetFrameCenterX(this._scrollingX);
-
-		this._scrollingY = this.GetVirtualHeight() / 2;
-		this._scrollingYTarget = this._scrollingY;
-		if (this.CenterDisplay)
-			this.SetFrameCenterY(this._scrollingY);
+		this.checkboxWithinFolder = props['IsPropChecked']("Checkbox within folder");
+		//this.editable6Text = props['GetPropertyStr']("Editable 6");
+		this.surf = new darkEdif['Surface'](this.rh, true, true, 32, 32, true);
+		this.surf['SetAsExtensionDisplay'](this);
 
 		// The return value is not used in this version of the runtime: always return false.
 		return false;
@@ -459,72 +616,25 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 		/// CRunExtension.REFLAG_ONESHOT : this function will not be called anymore,
 		///								   unless this.reHandle() is called. </returns>
 		
-		this._resX = this.GetFrameRight() - this.GetFrameLeft();
-		this._resY = this.GetFrameBottom() - this.GetFrameTop();
-
-		this._dt = this.GetDelta();
-
-		if (!this.Peytonphile)
-		{
-			this._marginMiddleX = this.Clamp(this.Clamp(this.GetMouseX(), this.GetFrameLeft(), this.GetFrameRight()) - this.GetFrameLeft(), ((this._resX / 2) - (this.Margin / 2)), ((this._resX / 2) + (this.Margin / 2)));
-			this._marginMiddleY = this.Clamp(this.Clamp(this.GetMouseY(), this.GetFrameTop(), this.GetFrameBottom()) - this.GetFrameTop(), ((this._resY / 2) - (this.Margin / 2)), ((this._resY / 2) + (this.Margin / 2)));
-			this._xSpeed = 0;
-			this._ySpeed = 0;
+		const colors = [
+			darkEdif['ColorRGB'](128, 0, 0), darkEdif['ColorRGB'](168, 157, 50),
+			darkEdif['ColorRGB'](50, 168, 64), darkEdif['ColorRGB'](50, 54, 168)
+		];
+		if (this.nextTick == null) {
+			this.nextTick = Date.now() + 200;
+			this.i = 0;
+		}
+		if (this.nextTick < Date.now()) {
+			this.nextTick = Date.now() + 200;
+			if (++this.i > colors.length)
+				this.i = 0;
+			this.surf['FillImageWith'](darkEdif['SurfaceFill']['Solid'](colors[this.i]));
 		}
 		
-		if (!this._dontScroll && this.HoriScrolling && !this.Peytonphile)
-		{
-			this._xSpeed = ((this.Clamp(this.GetMouseX(), this.GetFrameLeft(), this.GetFrameRight()) - this.GetFrameLeft()) - this._marginMiddleX) / this.Divisor;
-			this._scrollingXTarget = this.Clamp((this._scrollingXTarget + (this._xSpeed * this._dt)), (this._resX / 2), (this.GetVirtualWidth() - (this._resX / 2)));
-		}
-
-		if (!this._dontScroll && this.VertScrolling && !this.Peytonphile)
-		{
-			this._ySpeed = ((this.Clamp(this.GetMouseY(), this.GetFrameTop(), this.GetFrameBottom()) - this.GetFrameTop()) - this._marginMiddleY) / (this.Divisor + 0.0) * ((this._resX + 0.0) / this._resY);
-			this._scrollingYTarget = this.Clamp((this._scrollingYTarget + (this._ySpeed * this._dt)), (this._resY / 2), (this.GetVirtualHeight() - (this._resY / 2)));
-		}
-
-		if (!this.Easing && this.HoriScrolling)
-		{
-			this._scrollingX = this._scrollingXTarget;
-			if (this.CenterDisplay)
-				this.SetFrameCenterX(this._scrollingX);
-		}
-
-		if (!this.Easing && this.VertScrolling)
-		{
-			this._scrollingY = this._scrollingYTarget;
-			if (this.CenterDisplay)
-				this.SetFrameCenterY(this._scrollingY);
-		}
-
-		if (this.Easing && this.HoriScrolling)
-		{
-			this._scrollingX = this._scrollingX + (this._scrollingXTarget - this._scrollingX) * Clamp((this.Factor / 100.0) * this._dt, 0, 1);
-			if (this.CenterDisplay)
-				this.SetFrameCenterX(this._scrollingX);
-		}
-
-		if (this.Easing && this.VertScrolling)
-		{
-			this._scrollingY = this._scrollingY + (this._scrollingYTarget - this._scrollingY) * Clamp((this.Factor / 100.0) * this._dt, 0, 1);
-			if (this.CenterDisplay)
-				this.SetFrameCenterY(this._scrollingY);
-		}
-
-		if (this.Peytonphile)
-		{
-			this._xSpeed = 0;
-			this._ySpeed = 0;
-
-			if (!this._dontScroll && this.HoriScrolling)
-				this._scrollingXTarget = this.Clamp((this.GetVirtualWidth() / 2) + (((this.GetMouseX() - ((this.GetVirtualWidth()) / 2))) * ((this.GetVirtualWidth() - (this._resX + 0.0)) / this.GetVirtualWidth())), (this._resX / 2), this.GetVirtualWidth() - (this._resX / 2));
-
-			if (!this._dontScroll && this.VertScrolling)
-				this._scrollingYTarget = this.Clamp((this.GetVirtualHeight() / 2) + (((this.GetMouseY() - ((this.GetVirtualHeight()) / 2))) * ((this.GetVirtualHeight() - (this._resY + 0.0)) / this.GetVirtualHeight())), (this._resY / 2), this.GetVirtualHeight() - (this._resY / 2));
-		}
-
-		return 0;
+		return this.surf['GetAndResetAltered']() ? CRunExtension.REFLAG_DISPLAY : 0;
+	},
+	displayRunObject: function (renderer, xDraw, yDraw) {
+		this.surf.BlitToFrameWithExtEffects(renderer);
 	},
 
 	condition: function(num, cnd) {
@@ -536,7 +646,7 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 
 		const func = this.$conditionFuncs[~~num];
 		if (func == null) {
-			throw "Unrecognised condition ID " + (~~num) + " passed to DarkEdif Template.";
+			throw "Unrecognised condition ID " + (~~num) + " passed to SunkenCamera.";
 		}
 
 		// Note: New Direction parameter is not supported by this, add a workaround based on condition and parameter index;
@@ -557,7 +667,7 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 
 		const func = this.$actionFuncs[~~num];
 		if (func == null) {
-			throw "Unrecognised action ID " + (~~num) + " passed to DarkEdif Template.";
+			throw "Unrecognised action ID " + (~~num) + " passed to SunkenCamera.";
 		}
 
 		// Note: New Direction parameter is not supported by this, add a workaround based on action and parameter index;
@@ -580,7 +690,7 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 
 		const func = this.$expressionFuncs[~~num];
 		if (func == null) {
-			throw "Unrecognised expression ID " + (~~num) + " passed to DarkEdif Template.";
+			throw "Unrecognised expression ID " + (~~num) + " passed to SunkenCamera.";
 		}
 
 		const args = new Array(func.length);
@@ -589,86 +699,6 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 		}
 
 		return func.apply(this, args);
-	},
-	GetFrameRight: function()
-	{
-		var r = this.rh.rhWindowX;
-		if ((this.rh.rh3Scrolling & CRun.RH3SCROLLING_SCROLL) != 0)
-			r = this.rh.rh3DisplayX;
-		r += this.rh.rh3WindowSx;
-		if (r > this.rh.rhLevelSx)
-			r = this.rh.rhLevelSx;
-		return r;
-	},
-	GetFrameLeft: function()
-	{
-		var r = this.rh.rhWindowX;
-		if ((this.rh.rh3Scrolling & CRun.RH3SCROLLING_SCROLL) != 0)
-			r = this.rh.rh3DisplayX;
-		if (r < 0)
-			r = 0;
-		return r;
-	},
-	GetFrameBottom: function()
-	{
-		var r = this.rh.rhWindowY;
-		if ((this.rh.rh3Scrolling & CRun.RH3SCROLLING_SCROLL) != 0)
-			r = this.rh.rh3DisplayY;
-		r += this.rh.rh3WindowSy;
-		if (r > this.rh.rhLevelSy)
-			r = this.rh.rhLevelSy;
-		return r;
-	},
-	GetFrameTop: function()
-	{
-		var r = this.rh.rhWindowY;
-		if ((this.rh.rh3Scrolling & CRun.RH3SCROLLING_SCROLL) != 0)
-			r = this.rh.rh3DisplayY;
-		if (r < 0)
-			r = 0;
-		return r;
-	},
-	SetFrameCenterX: function(centerX)
-	{
-		this.rh.setDisplay(centerX, 0, -1, 1)
-	},
-	SetFrameCenterY: function(centerY)
-	{
-		this.rh.setDisplay(0, centerY, -1, 2)
-	},
-	Clamp: function(value, min, max)
-	{
-		if (value < min)
-			value = min;
-		if (value > max)
-			value = max;
-		return value;
-	},
-	GetMouseX: function()
-	{
-		if (this.HoriFlipped)
-			return (this._resX - this.rh.rh2MouseX) + this.rh.rh3DisplayX;
-		else
-			return this.rh.rh2MouseX + this.rh.rh3DisplayX;
-	},
-	GetMouseY: function()
-	{
-		if (this.VertFlipped)
-			return (this._resY - this.rh.rh2MouseY) + this.rh.rh3DisplayY;
-		else
-			return this.rh.rh2MouseY + this.rh.rh3DisplayY;
-	},
-	GetDelta: function()
-	{
-		return this.rh.rh4MvtTimerCoef;
-	},
-	GetVirtualWidth: function()
-	{
-		return this.rh.rhFrame.leVirtualRect.right;
-	},
-	GetVirtualHeight: function()
-	{
-		return this.rh.rhFrame.leVirtualRect.bottom;
 	}
 
 	// No comma for the last function : the Google compiler

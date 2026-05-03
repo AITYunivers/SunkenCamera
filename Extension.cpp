@@ -1,4 +1,6 @@
 #include "Common.hpp"
+#include <iomanip>
+using namespace std::chrono_literals;
 
 ///
 /// EXTENSION CONSTRUCTOR/DESTRUCTOR
@@ -8,12 +10,11 @@
 Extension::Extension(RunObject* const _rdPtr, const EDITDATA* const edPtr, const CreateObjectInfo* const cobPtr) :
 	rdPtr(_rdPtr), rhPtr(_rdPtr->get_rHo()->get_AdRunHeader()), Runtime(this), FusionDebugger(this)
 #elif defined(__ANDROID__)
-Extension::Extension(const EDITDATA* const edPtr, const jobject javaExtPtr) :
+Extension::Extension(const EDITDATA* const edPtr, const jobject javaExtPtr, const CreateObjectInfo* const cobPtr) :
 	javaExtPtr(javaExtPtr, "Extension::javaExtPtr from Extension ctor"),
-	crectClass(mainThreadJNIEnv->FindClass("Services/CRect"), "Services/CRect"),
 	Runtime(this, this->javaExtPtr), FusionDebugger(this)
 #else
-Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr) :
+Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr, const CreateObjectInfo* const cobPtr) :
 	objCExtPtr(objCExtPtr), Runtime(this, objCExtPtr), FusionDebugger(this)
 #endif
 {
@@ -22,18 +23,18 @@ Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr) :
 		IDs in the JSON here
 	*/
 
-	LinkAction(0,  SetDivisor);
-	LinkAction(1,  SetMargin);
-	LinkAction(2,  SetFactor);
+	LinkAction(0, SetDivisor);
+	LinkAction(1, SetMargin);
+	LinkAction(2, SetFactor);
 
-	LinkAction(3,  SetDisallowScrolling);
-	LinkAction(8,  SetCenterDisplay);
-	LinkAction(4,  SetEasing);
-	LinkAction(5,  SetHoriScrolling);
-	LinkAction(6,  SetVertScrolling);
-	LinkAction(7,  SetPeytonphile);
+	LinkAction(3, SetDisallowScrolling);
+	LinkAction(8, SetCenterDisplay);
+	LinkAction(4, SetEasing);
+	LinkAction(5, SetHoriScrolling);
+	LinkAction(6, SetVertScrolling);
+	LinkAction(7, SetPeytonphile);
 
-	LinkAction(9,  SetCameraPosX);
+	LinkAction(9, SetCameraPosX);
 	LinkAction(10, SetCameraPosY);
 	LinkAction(11, SetCameraTargetX);
 	LinkAction(12, SetCameraTargetY);
@@ -70,82 +71,121 @@ Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr) :
 		anything from edPtr to the extension class here.
 
 	*/
-#ifdef EditorBuild
+
+	// Don't use "this" inside these lambda functions, always ext.
+	// There can be nothing in the [] section of the lambda.
+	// If you're not sure about lambdas, you can remove this debugger stuff without any side effects;
+	// it's just an example of how to use the debugger. You can view it in Fusion itself to see.
+#if defined(EditorBuild) && defined(_WIN32)
 	FusionDebugger.AddItemToDebugger(
+		_T("Divisor: "sv), NULL,
 		[](Extension* ext, std::tstring& writeTo) {
-			writeTo = _T("Divisor: ") + std::to_tstring(ext->Divisor);
+			writeTo = std::to_tstring(ext->Divisor);
 		},
 		NULL, 10, NULL
 	);
 	FusionDebugger.AddItemToDebugger(
+		_T("Margin: "sv), NULL,
 		[](Extension* ext, std::tstring& writeTo) {
-			writeTo = _T("Margin: ") + std::to_tstring(ext->Margin);
+			writeTo = std::to_tstring(ext->Margin);
 		},
 		NULL, 10, NULL
 	);
 	FusionDebugger.AddItemToDebugger(
+		_T("Factor: "sv), NULL,
 		[](Extension* ext, std::tstring& writeTo) {
-			writeTo = _T("Factor: ") + std::to_tstring(ext->Factor);
+			writeTo = std::to_tstring(ext->Factor);
 		},
 		NULL, 10, NULL
 	);
 	FusionDebugger.AddItemToDebugger(
+		_T("Disallow Scrolling: "sv), NULL,
 		[](Extension* ext, std::tstring& writeTo) {
-			writeTo = _T("Center Display: ") + std::to_tstring(ext->CenterDisplay);
+			writeTo = ext->DontScroll != 0 ? _T("True") : _T("False");
 		},
 		NULL, 10, NULL
 	);
 	FusionDebugger.AddItemToDebugger(
+		_T("Center Display: "sv), NULL,
 		[](Extension* ext, std::tstring& writeTo) {
-			writeTo = _T("Easing: ") + std::to_tstring(ext->Easing);
+			writeTo = ext->CenterDisplay != 0 ? _T("True") : _T("False");
 		},
 		NULL, 10, NULL
 	);
 	FusionDebugger.AddItemToDebugger(
+		_T("Easing: "sv), NULL,
 		[](Extension* ext, std::tstring& writeTo) {
-			writeTo = _T("Horizontal Scrolling: ") + std::to_tstring(ext->HoriScrolling);
+			writeTo = ext->Easing != 0 ? _T("True") : _T("False");
 		},
 		NULL, 10, NULL
 	);
 	FusionDebugger.AddItemToDebugger(
+		_T("Horizontal Scrolling: "sv), NULL,
 		[](Extension* ext, std::tstring& writeTo) {
-			writeTo = _T("Vertical Scrolling: ") + std::to_tstring(ext->VertScrolling);
+			writeTo = ext->HoriScrolling != 0 ? _T("True") : _T("False");
 		},
 		NULL, 10, NULL
 	);
 	FusionDebugger.AddItemToDebugger(
+		_T("Vertical Scrolling: "sv), NULL,
 		[](Extension* ext, std::tstring& writeTo) {
-			writeTo = _T("Peytonphile Scrolling: ") + std::to_tstring(ext->Peytonphile);
+			writeTo = ext->VertScrolling != 0 ? _T("True") : _T("False");
 		},
 		NULL, 10, NULL
 	);
 	FusionDebugger.AddItemToDebugger(
+		_T("Peytonphile Scrolling: "sv), NULL,
 		[](Extension* ext, std::tstring& writeTo) {
-			writeTo = _T("X Scroll: ") + std::to_tstring(ext->_scrollingX);
+			writeTo = ext->Peytonphile != 0 ? _T("True") : _T("False");
 		},
 		NULL, 10, NULL
 	);
 	FusionDebugger.AddItemToDebugger(
+		_T("Peytonphile Scrolling to Edges: "sv), NULL,
 		[](Extension* ext, std::tstring& writeTo) {
-			writeTo = _T("Y Scroll: ") + std::to_tstring(ext->_scrollingY);
+			writeTo = ext->PeytonphileToEdges != 0 ? _T("True") : _T("False");
 		},
 		NULL, 10, NULL
 	);
 	FusionDebugger.AddItemToDebugger(
+		_T("Input Flipped Horizontally: "sv), NULL,
 		[](Extension* ext, std::tstring& writeTo) {
-			writeTo = _T("X Speed: ") + std::to_tstring(ext->_xSpeed);
+			writeTo = ext->HoriFlipped != 0 ? _T("True") : _T("False");
 		},
 		NULL, 10, NULL
 	);
 	FusionDebugger.AddItemToDebugger(
+		_T("Input Flipped Vertically: "sv), NULL,
 		[](Extension* ext, std::tstring& writeTo) {
-			writeTo = _T("Y Speed: ") + std::to_tstring(ext->_ySpeed);
+			writeTo = ext->VertFlipped != 0 ? _T("True") : _T("False");
 		},
 		NULL, 10, NULL
 	);
 	FusionDebugger.AddItemToDebugger(
+		_T("X Scroll: "sv), NULL,
 		[](Extension* ext, std::tstring& writeTo) {
-			writeTo = _T("Disallow Scrolling: ") + std::to_tstring(ext->_dontScroll);
+			writeTo = std::to_tstring(ext->_scrollingX);
+		},
+		NULL, 10, NULL
+	);
+	FusionDebugger.AddItemToDebugger(
+		_T("Y Scroll: "sv), NULL,
+		[](Extension* ext, std::tstring& writeTo) {
+			writeTo = std::to_tstring(ext->_scrollingY);
+		},
+		NULL, 10, NULL
+	);
+	FusionDebugger.AddItemToDebugger(
+		_T("X Speed: "sv), NULL,
+		[](Extension* ext, std::tstring& writeTo) {
+			writeTo = std::to_tstring(ext->_xSpeed);
+		},
+		NULL, 10, NULL
+	);
+	FusionDebugger.AddItemToDebugger(
+		_T("Y Speed: "sv), NULL,
+		[](Extension* ext, std::tstring& writeTo) {
+			writeTo = std::to_tstring(ext->_ySpeed);
 		},
 		NULL, 10, NULL
 	);
@@ -153,26 +193,28 @@ Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr) :
 
 	// Read object DarkEdif properties; you can pass property name, or property index
 	// This will work on all platforms the same way.
+	// See edPtr->Props functions.
 	Divisor = edPtr->Props.GetPropertyNum(0);
 	Margin = edPtr->Props.GetPropertyNum(1);
 	Factor = Clamp(edPtr->Props.GetPropertyNum(2), 0, 100);
 
-	CenterDisplay = edPtr->Props.IsPropChecked(3);
-	Easing = edPtr->Props.IsPropChecked(4);
-	HoriScrolling = edPtr->Props.IsPropChecked(5);
-	VertScrolling = edPtr->Props.IsPropChecked(6);
-	Peytonphile = edPtr->Props.IsPropChecked(7);
+	DontScroll = edPtr->Props.IsPropChecked(3);
+	CenterDisplay = edPtr->Props.IsPropChecked(4);
+	Easing = edPtr->Props.IsPropChecked(5);
+	HoriScrolling = edPtr->Props.IsPropChecked(6);
+	VertScrolling = edPtr->Props.IsPropChecked(7);
+	Peytonphile = edPtr->Props.IsPropChecked(8);
+	PeytonphileToEdges = edPtr->Props.IsPropChecked(9);
 
-	HoriFlipped = edPtr->Props.IsPropChecked(8);
-	VertFlipped = edPtr->Props.IsPropChecked(9);
+	HoriFlipped = edPtr->Props.IsPropChecked(10);
+	VertFlipped = edPtr->Props.IsPropChecked(11);
 
-#if __ANDROID__
-	IgnoreLast = edPtr->Props.IsPropChecked(10);
+#if defined(__ANDROID__) || defined(__APPLE__)
+	IgnoreLast = edPtr->Props.IsPropChecked(12);
 #endif
 
 	_marginMiddleX = _marginMiddleY =
-	_dt = _xSpeed = _ySpeed = 0;
-	_dontScroll = false;
+		_dt = _xSpeed = _ySpeed = 0;
 
 	_resX = GetFrameRight() - GetFrameLeft();
 	_resY = GetFrameBottom() - GetFrameTop();
@@ -186,14 +228,30 @@ Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr) :
 	_scrollingYTarget = _scrollingY;
 	if (CenterDisplay)
 		SetFrameCenterY(_scrollingY);
+
+#if TEXT_OEFLAG_EXTENSION
+	// Copy from edittime data into runtime data
+	font.CopyFromEditFont(this, edPtr->font);
+
+	// Set Runtime.fontChangedFunc to trigger a function if the runtime
+	// changes your ext's font via the built-in font actions
+	Runtime.fontChangedFunc = &Extension::OnFontChanged;
+#endif
+
+#if DARKEDIF_DISPLAY_TYPE == DARKEDIF_DISPLAY_SIMPLE
+	Runtime.SetSurfaceWithSize(edPtr->objSize.width, edPtr->objSize.height);
+	// surf is already constructed
+	// To start, let's make the image a solid blue fill
+	surf->FillImageWith(DarkEdif::SurfaceFill::Solid(DarkEdif::ColorRGB(0, 0, 127)));
+#endif
 }
 
 Extension::~Extension()
 {
-	
+
 }
 
-
+// Runs every tick of Fusion's runtime, can be toggled off and back on
 REFLAG Extension::Handle()
 {
 	_resX = GetFrameRight() - GetFrameLeft();
@@ -202,7 +260,7 @@ REFLAG Extension::Handle()
 	_dt = GetDelta();
 
 	int androidTap = true;
-#if __ANDROID__
+#if defined(__ANDROID__) || defined(__APPLE__)
 	if (IgnoreLast && !IsTapped())
 		androidTap = false;
 #endif
@@ -215,16 +273,35 @@ REFLAG Extension::Handle()
 		_ySpeed = 0;
 	}
 
-	if (!_dontScroll && androidTap && HoriScrolling && !Peytonphile)
+	if (!DontScroll && androidTap && HoriScrolling && !Peytonphile)
 	{
 		_xSpeed = ((Clamp(GetMouseX(), GetFrameLeft(), GetFrameRight()) - GetFrameLeft()) - _marginMiddleX) / Divisor;
 		_scrollingXTarget = Clamp((_scrollingXTarget + (_xSpeed * _dt)), (_resX / 2), (GetVirtualWidth() - (_resX / 2)));
 	}
 
-	if (!_dontScroll && androidTap && VertScrolling && !Peytonphile)
+	if (!DontScroll && androidTap && VertScrolling && !Peytonphile)
 	{
 		_ySpeed = ((Clamp(GetMouseY(), GetFrameTop(), GetFrameBottom()) - GetFrameTop()) - _marginMiddleY) / (Divisor + 0.0f) * ((_resX + 0.0f) / _resY);
 		_scrollingYTarget = Clamp((_scrollingYTarget + (_ySpeed * _dt)), (_resY / 2), (GetVirtualHeight() - (_resY / 2)));
+	}
+
+	if (Peytonphile && androidTap)
+	{
+		_xSpeed = 0;
+		_ySpeed = 0;
+
+		int mX = GetMouseX() - Margin;
+		int mY = GetMouseY() - Margin;
+		int mWidth = GetVirtualWidth() - Margin * 2;
+		int mHeight = GetVirtualHeight() - Margin * 2;
+		int eWidth = PeytonphileToEdges ? GetVirtualWidth() : mWidth;
+		int eHeight = PeytonphileToEdges ? GetVirtualHeight() : mHeight;
+
+		if (!DontScroll && HoriScrolling)
+			_scrollingXTarget = Clamp((eWidth / 2) + (((mX - (mWidth / 2))) * ((eWidth - (_resX + 0.0)) / mWidth)), (_resX / 2), eWidth - (_resX / 2)) + (PeytonphileToEdges ? 0 : Margin);
+
+		if (!DontScroll && VertScrolling)
+			_scrollingYTarget = Clamp((eHeight / 2) + (((mY - (mHeight / 2))) * ((eHeight - (_resY + 0.0)) / mHeight)), (_resY / 2), eHeight - (_resY / 2)) + (PeytonphileToEdges ? 0 : Margin);
 	}
 
 	if (!Easing && HoriScrolling)
@@ -255,45 +332,8 @@ REFLAG Extension::Handle()
 			SetFrameCenterY(_scrollingY);
 	}
 
-	if (Peytonphile && androidTap)
-	{
-		_xSpeed = 0;
-		_ySpeed = 0;
-
-		if (!_dontScroll && HoriScrolling)
-			_scrollingXTarget = Clamp((GetVirtualWidth() / 2) + (((GetMouseX() - ((GetVirtualWidth()) / 2))) * ((GetVirtualWidth() - (_resX + 0.0)) / GetVirtualWidth())), (_resX / 2), GetVirtualWidth() - (_resX / 2));
-
-		if (!_dontScroll && VertScrolling)
-			_scrollingYTarget = Clamp((GetVirtualHeight() / 2) + (((GetMouseY() - ((GetVirtualHeight()) / 2))) * ((GetVirtualHeight() - (_resY + 0.0)) / GetVirtualHeight())), (_resY / 2), GetVirtualHeight() - (_resY / 2));
-	}
-
 	return REFLAG::NONE;
 }
-
-REFLAG Extension::Display()
-{
-	/*
-		If you return REFLAG_DISPLAY in Handle() this routine will run.
-	*/
-
-	// Ok
-	return REFLAG::DISPLAY;
-}
-
-short Extension::FusionRuntimePaused()
-{
-
-	// Ok
-	return 0;
-}
-
-short Extension::FusionRuntimeContinued()
-{
-
-	// Ok
-	return 0;
-}
-
 
 // These are called if there's no function linked to an ID
 
@@ -312,90 +352,27 @@ long Extension::UnlinkedExpression(int ID)
 {
 	DarkEdif::MsgBox::Error(_T("Extension::UnlinkedExpression() called"), _T("Running a fallback for expression ID %d. Make sure you ran LinkExpression()."), ID);
 	// Unlinked A/C/E is fatal error, but try not to return null string and definitely crash it
-	if ((size_t)ID < Edif::SDK->ExpressionInfos.size() && Edif::SDK->ExpressionInfos[ID]->Flags.ef == ExpReturnType::String)
+	if ((std::size_t)ID < Edif::SDK->ExpressionInfos.size() && Edif::SDK->ExpressionInfos[ID]->Flags.ef == ExpReturnType::String)
 		return (long)Runtime.CopyString(_T(""));
 	return 0;
 }
 
 int Extension::GetFrameRight()
 {
-#ifdef _WIN32
-	int r = rhPtr->WindowX;
-	if ((rhPtr->rh3.Scrolling & RH3SCROLLING_SCROLL) != 0)
-		r = rhPtr->rh3.DisplayX;
-	r += rhPtr->rh3.WindowSx;
-	if (r > rhPtr->LevelSx)
-		r = rhPtr->LevelSx;
-#elif __ANDROID__
-	jfieldID _fid_rhWindowX = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rhWindowX", "I");
-	JNIExceptionCheck();
-	int rhWindowX = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rhWindowX);
-	JNIExceptionCheck();
-
-	jfieldID _fid_rh3Scrolling = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3Scrolling", "C");
-	JNIExceptionCheck();
-	char rh3Scrolling = mainThreadJNIEnv->GetCharField(rhPtr->crun, _fid_rh3Scrolling);
-	JNIExceptionCheck();
-
-	int r = rhWindowX;
-	if ((rh3Scrolling & 1) != 0)
-	{
-		jfieldID _fid_rh3DisplayX = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayX", "I");
-		JNIExceptionCheck();
-		int rh3DisplayX = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3DisplayX);
-		JNIExceptionCheck();
-
-		r = rh3DisplayX;
-	}
-
-	jfieldID _fid_rh3WindowSx = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3WindowSx", "I");
-	JNIExceptionCheck();
-	int rh3WindowSx = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3WindowSx);
-	JNIExceptionCheck();
-
-	r += rh3WindowSx;
-
-	jfieldID _fid_rhLevelSx = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rhLevelSx", "I");
-	JNIExceptionCheck();
-	int rhLevelSx = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rhLevelSx);
-	JNIExceptionCheck();
-
-	if (r > rhLevelSx)
-		r = rhLevelSx;
-#endif
-
+	int r = rhPtr->get_WindowX();
+	if ((rhPtr->GetRH3Scrolling() & 0x1) != 0) // RH3SCROLLING_SCROLL
+		r = rhPtr->GetRH3DisplayX();
+	r += rhPtr->GetRH3WindowSx();
+	if (r > rhPtr->get_LevelSx())
+		r = rhPtr->get_LevelSx();
 	return r;
 }
 
 int Extension::GetFrameLeft()
 {
-#ifdef _WIN32
-	int r = rhPtr->WindowX;
-	if ((rhPtr->rh3.Scrolling & RH3SCROLLING_SCROLL) != 0)
-		r = rhPtr->rh3.DisplayX;
-#elif __ANDROID__
-	jfieldID _fid_rhWindowX = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rhWindowX", "I");
-	JNIExceptionCheck();
-	int rhWindowX = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rhWindowX);
-	JNIExceptionCheck();
-
-	jfieldID _fid_rh3Scrolling = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3Scrolling", "C");
-	JNIExceptionCheck();
-	char rh3Scrolling = mainThreadJNIEnv->GetCharField(rhPtr->crun, _fid_rh3Scrolling);
-	JNIExceptionCheck();
-
-	int r = rhWindowX;
-	if ((rh3Scrolling & 1) != 0)
-	{
-		jfieldID _fid_rh3DisplayX = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayX", "I");
-		JNIExceptionCheck();
-		int rh3DisplayX = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3DisplayX);
-		JNIExceptionCheck();
-
-		r = rh3DisplayX;
-	}
-#endif
-
+	int r = rhPtr->get_WindowX();
+	if ((rhPtr->GetRH3Scrolling() & 0x1) != 0) // RH3SCROLLING_SCROLL
+		r = rhPtr->GetRH3DisplayX();
 	if (r < 0)
 		r = 0;
 	return r;
@@ -403,83 +380,20 @@ int Extension::GetFrameLeft()
 
 int Extension::GetFrameBottom()
 {
-#ifdef _WIN32
-	int r = rhPtr->WindowY;
-	if ((rhPtr->rh3.Scrolling & RH3SCROLLING_SCROLL) != 0)
-		r = rhPtr->rh3.DisplayY;
-	r += rhPtr->rh3.WindowSy;
-	if (r > rhPtr->LevelSy)
-		r = rhPtr->LevelSy;
-#elif __ANDROID__
-	jfieldID _fid_rhWindowY = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rhWindowY", "I");
-	JNIExceptionCheck();
-	int rhWindowY = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rhWindowY);
-	JNIExceptionCheck();
-
-	jfieldID _fid_rh3Scrolling = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3Scrolling", "C");
-	JNIExceptionCheck();
-	char rh3Scrolling = mainThreadJNIEnv->GetCharField(rhPtr->crun, _fid_rh3Scrolling);
-	JNIExceptionCheck();
-
-	int r = rhWindowY;
-	if ((rh3Scrolling & 1) != 0)
-	{
-		jfieldID _fid_rh3DisplayY = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayY", "I");
-		JNIExceptionCheck();
-		int rh3DisplayY = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3DisplayY);
-		JNIExceptionCheck();
-
-		r = rh3DisplayY;
-	}
-
-	jfieldID _fid_rh3WindowSy = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3WindowSy", "I");
-	JNIExceptionCheck();
-	int rh3WindowSy = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3WindowSy);
-	JNIExceptionCheck();
-
-	r += rh3WindowSy;
-
-	jfieldID _fid_rhLevelSy = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rhLevelSy", "I");
-	JNIExceptionCheck();
-	int rhLevelSy = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rhLevelSy);
-	JNIExceptionCheck();
-
-	if (r > rhLevelSy)
-		r = rhLevelSy;
-#endif
-
+	int r = rhPtr->get_WindowY();
+	if ((rhPtr->GetRH3Scrolling() & 0x1) != 0) // RH3SCROLLING_SCROLL
+		r = rhPtr->GetRH3DisplayY();
+	r += rhPtr->GetRH3WindowSy();
+	if (r > rhPtr->get_LevelSy())
+		r = rhPtr->get_LevelSy();
 	return r;
 }
 
 int Extension::GetFrameTop()
 {
-#ifdef _WIN32
-	int r = rhPtr->WindowY;
-	if ((rhPtr->rh3.Scrolling & RH3SCROLLING_SCROLL) != 0)
-		r = rhPtr->rh3.DisplayY;
-#elif __ANDROID__
-	jfieldID _fid_rhWindowY = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rhWindowY", "I");
-	JNIExceptionCheck();
-	int rhWindowY = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rhWindowY);
-	JNIExceptionCheck();
-
-	jfieldID _fid_rh3Scrolling = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3Scrolling", "C");
-	JNIExceptionCheck();
-	char rh3Scrolling = mainThreadJNIEnv->GetCharField(rhPtr->crun, _fid_rh3Scrolling);
-	JNIExceptionCheck();
-
-	int r = rhWindowY;
-	if ((rh3Scrolling & 1) != 0)
-	{
-		jfieldID _fid_rh3DisplayY = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayY", "I");
-		JNIExceptionCheck();
-		int rh3DisplayY = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3DisplayY);
-		JNIExceptionCheck();
-
-		r = rh3DisplayY;
-	}
-#endif
-
+	int r = rhPtr->get_WindowY();
+	if ((rhPtr->GetRH3Scrolling() & 0x1) != 0) // RH3SCROLLING_SCROLL
+		r = rhPtr->GetRH3DisplayY();
 	if (r < 0)
 		r = 0;
 	return r;
@@ -487,45 +401,15 @@ int Extension::GetFrameTop()
 
 void Extension::SetFrameCenterX(int centerX)
 {
-#ifdef _WIN32
-	centerX = Clamp(centerX - rhPtr->rh3.WindowSx / 2, 0, GetVirtualWidth() - rhPtr->rh3.WindowSx);
-	rhPtr->rh3.DisplayX = centerX;
-#elif __ANDROID__
-	jfieldID _fid_rh3WindowSx = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3WindowSx", "I");
-	JNIExceptionCheck();
-	int rh3WindowSx = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3WindowSx);
-	JNIExceptionCheck();
-
-	centerX = Clamp(centerX - rh3WindowSx / 2, 0, GetVirtualWidth() - rh3WindowSx);
-
-	jfieldID _fid_rh3DisplayX = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayX", "I");
-	JNIExceptionCheck();
-	mainThreadJNIEnv->SetIntField(rhPtr->crun, _fid_rh3DisplayX, centerX);
-	JNIExceptionCheck();
-#endif
-
+	centerX = Clamp(centerX - rhPtr->GetRH3WindowSx() / 2, 0, GetVirtualWidth() - rhPtr->GetRH3WindowSx());
+	rhPtr->SetRH3DisplayX(centerX);
 	Runtime.Redisplay();
 }
 
 void Extension::SetFrameCenterY(int centerY)
 {
-#ifdef _WIN32
-	centerY = Clamp(centerY - rhPtr->rh3.WindowSy / 2, 0, GetVirtualHeight() - rhPtr->rh3.WindowSy);
-	rhPtr->rh3.DisplayY = centerY;
-#elif __ANDROID__
-	jfieldID _fid_rh3WindowSy = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3WindowSy", "I");
-	JNIExceptionCheck();
-	int rh3WindowSy = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3WindowSy);
-	JNIExceptionCheck();
-
-	centerY = Clamp(centerY - rh3WindowSy / 2, 0, GetVirtualHeight() - rh3WindowSy);
-
-	jfieldID _fid_rh3DisplayY = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayY", "I");
-	JNIExceptionCheck();
-	mainThreadJNIEnv->SetIntField(rhPtr->crun, _fid_rh3DisplayY, centerY);
-	JNIExceptionCheck();
-#endif
-
+	centerY = Clamp(centerY - rhPtr->GetRH3WindowSy() / 2, 0, GetVirtualHeight() - rhPtr->GetRH3WindowSy());
+	rhPtr->SetRH3DisplayY(centerY);
 	Runtime.Redisplay();
 }
 
@@ -540,106 +424,42 @@ double Extension::Clamp(double value, double min, double max)
 
 int Extension::GetMouseX()
 {
-#ifdef _WIN32
 	if (HoriFlipped)
-		return (_resX - rhPtr->rh2.MouseClient.x) + rhPtr->rh3.DisplayX;
+		return (_resX - rhPtr->getRH2MouseClientX()) + rhPtr->GetRH3DisplayX();
 	else
-		return rhPtr->rh2.Mouse.x;
-#elif __ANDROID__
-	jfieldID _fid_mouseX = mainThreadJNIEnv->GetFieldID(rhPtr->get_App()->meClass, "mouseX", "I");
-	JNIExceptionCheck();
-	int mouseX = mainThreadJNIEnv->GetIntField(rhPtr->get_App()->me, _fid_mouseX);
-	JNIExceptionCheck();
-
-	jfieldID _fid_rh3DisplayX = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayX", "I");
-	JNIExceptionCheck();
-	int rh3DisplayX = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3DisplayX);
-	JNIExceptionCheck();
-
-	if (HoriFlipped)
-		return (_resX - mouseX) + rh3DisplayX;
-	else
-		return mouseX + rh3DisplayX;
-#endif
+		return rhPtr->getRH2MouseX();
 }
 
 int Extension::GetMouseY()
 {
-#ifdef _WIN32
 	if (VertFlipped)
-		return (_resY - rhPtr->rh2.MouseClient.y) + rhPtr->rh3.DisplayY;
+		return (_resY - rhPtr->getRH2MouseClientY()) + rhPtr->GetRH3DisplayY();
 	else
-		return rhPtr->rh2.Mouse.y;
-#elif __ANDROID__
-	jfieldID _fid_mouseY = mainThreadJNIEnv->GetFieldID(rhPtr->get_App()->meClass, "mouseY", "I");
-	JNIExceptionCheck();
-	int mouseY = mainThreadJNIEnv->GetIntField(rhPtr->get_App()->me, _fid_mouseY);
-	JNIExceptionCheck();
-
-	jfieldID _fid_rh3DisplayY = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh3DisplayY", "I");
-	JNIExceptionCheck();
-	int rh3DisplayY = mainThreadJNIEnv->GetIntField(rhPtr->crun, _fid_rh3DisplayY);
-	JNIExceptionCheck();
-
-	if (VertFlipped)
-		return (_resY - mouseY) + rh3DisplayY;
-	else
-		return mouseY + rh3DisplayY;
-#endif
+		return rhPtr->getRH2MouseY();
 }
 
 double Extension::GetDelta()
 {
-#ifdef _WIN32
-	return rhPtr->rh4.mvtTimerCoef;
-#elif __ANDROID__
-	jfieldID _fid_rh4MvtTimerCoef = mainThreadJNIEnv->GetFieldID(rhPtr->crunClass, "rh4MvtTimerCoef", "D");
-	JNIExceptionCheck();
-	double rh4MvtTimerCoef = mainThreadJNIEnv->GetDoubleField(rhPtr->crun, _fid_rh4MvtTimerCoef);
-	JNIExceptionCheck();
-	return rh4MvtTimerCoef;
-#endif
+	return rhPtr->getRH4MvtTimerCoef();
 }
 
 int Extension::GetVirtualWidth()
 {
-#ifdef _WIN32
-	return rhPtr->Frame->VirtualRect.right;
-#elif __ANDROID__
-	CRunFrame* frame = rhPtr->get_App()->get_Frame();
-	jfieldID _fid_leVirtualRect = mainThreadJNIEnv->GetFieldID(frame->meClass, "leVirtualRect", "LServices/CRect;");
-	JNIExceptionCheck();
-	jobject leVirtualRect = mainThreadJNIEnv->GetObjectField(frame->me, _fid_leVirtualRect);
-	JNIExceptionCheck();
-	jfieldID _fid_right = mainThreadJNIEnv->GetFieldID(crectClass, "right", "I");
-	JNIExceptionCheck();
-	int right = mainThreadJNIEnv->GetIntField(leVirtualRect, _fid_right);
-	JNIExceptionCheck();
-	return right;
-#endif
+	return rhPtr->getFrameVirtualWidth();
 }
 
 int Extension::GetVirtualHeight()
 {
-#ifdef _WIN32
-	return rhPtr->Frame->VirtualRect.bottom;
-#elif __ANDROID__
-	CRunFrame* frame = rhPtr->get_App()->get_Frame();
-	jfieldID _fid_leVirtualRect = mainThreadJNIEnv->GetFieldID(frame->meClass, "leVirtualRect", "LServices/CRect;");
-	JNIExceptionCheck();
-	jobject leVirtualRect = mainThreadJNIEnv->GetObjectField(frame->me, _fid_leVirtualRect);
-	JNIExceptionCheck();
-	jfieldID _fid_bottom = mainThreadJNIEnv->GetFieldID(crectClass, "bottom", "I");
-	JNIExceptionCheck();
-	int bottom = mainThreadJNIEnv->GetIntField(leVirtualRect, _fid_bottom);
-	JNIExceptionCheck();
-	return bottom;
-#endif
+	return rhPtr->getFrameVirtualHeight();
 }
 
-#if __ANDROID__
+#if defined(__ANDROID__) || defined(__APPLE__)
 bool Extension::IsTapped()
 {
+#ifdef __ANDROID__
 	return AndroidMMFRuntime::get(&Runtime)->get_TouchManager()->anyTouchDown();
+#else
+	return rhPtr->getMouseDown();
+#endif
 }
 #endif

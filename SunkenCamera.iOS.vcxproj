@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM">
@@ -35,7 +35,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{BAF5099E-694D-48A8-9912-BAB1C003CF94}</ProjectGuid>
+    <ProjectGuid>{841e346f-8696-4456-b90d-9dd41abdccd6}</ProjectGuid>
     <Keyword>iOS</Keyword>
     <DefaultLanguage>en-GB</DefaultLanguage>
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
@@ -52,7 +52,27 @@
     <Import Project="SunkenCamera.Shared.vcxitems" Label="Shared" />
   </ImportGroup>
   <ItemGroup>
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\Array.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CBitmap.h" />
     <ClInclude Include="..\Inc\iOS\MMF2Lib\CCndExtension.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CCreateObjectInfo.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CExtension.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CFont.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CFontBank.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CFontInfo.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CImage.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CImageBank.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CImageUtils.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CoreMath.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CRCom.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CRect.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CRenderer.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CRenderToTexture.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CRenderUtils.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CRSpr.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CRunFrame.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CShader.h" />
+    <ClInclude Include="..\Inc\iOS\MMF2Lib\CTexture.h" />
     <ClInclude Include="..\Inc\iOS\MMFiOSMasterHeader.hpp" />
     <ClInclude Include="..\Inc\iOS\MMF2Lib\CActExtension.h" />
     <ClInclude Include="..\Inc\iOS\MMF2Lib\CEffectEx.h" />

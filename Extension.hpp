@@ -1,15 +1,17 @@
 #pragma once
 #include "DarkEdif.hpp"
 
-class Extension
+class Extension final
 {
 public:
-
+	// ======================================
+	// Required variables + functions
+	// Variables here must not be moved or swapped around or it can cause future issues
+	// ======================================
 	RunHeader* rhPtr;
-	RunObjectMultiPlatPtr rdPtr; // you should not need to access this
+	RunObjectMultiPlatPtr rdPtr;
 #ifdef __ANDROID__
 	global<jobject> javaExtPtr;
-	global<jclass> crectClass;
 #elif defined(__APPLE__)
 	void* const objCExtPtr;
 #endif
@@ -17,29 +19,35 @@ public:
 	Edif::Runtime Runtime;
 
 	static const int MinimumBuild = 254;
-	static const int Version = 3;
+	static const int Version = 4;
 
-	// If you change OEFLAGS, make sure you modify RUNDATA so the data is available, or you'll get crashes!
-	// For example, OEFLAGS::VALUES makes use of the AltVals rv struct.
-	static const OEFLAGS OEFLAGS = OEFLAGS::NONE;
-	static const OEPREFS OEPREFS = OEPREFS::NONE;
-
-	static const int WindowProcPriority = 100;
+	// Warning: OEFLAGS/OEPREFS cannot be freely modified when you have used them in MFAs.
+	static constexpr OEFLAGS OEFLAGS = OEFLAGS::VALUES;
+	static constexpr OEPREFS OEPREFS = OEPREFS::NONE;
+	// If OEFLAGS::WINDOW_PROC (otherwise you can delete)
+	// static constexpr int WindowProcPriority = 100;
+	// If OEFLAGS::TEXT (otherwise you can delete)
+	// static constexpr TextCapacity TextCapacity = TextCapacity::None;
 
 #ifdef _WIN32
 	Extension(RunObject* const rdPtr, const EDITDATA* const edPtr, const CreateObjectInfo* const cobPtr);
 #elif defined(__ANDROID__)
-	Extension(const EDITDATA* const edPtr, const jobject javaExtPtr);
+	Extension(const EDITDATA* const edPtr, const jobject javaExtPtr, const CreateObjectInfo* const cobPtr);
 #else
-	Extension(const EDITDATA* const edPtr, void* const objCExtPtr);
+	Extension(const EDITDATA* const edPtr, void* const objCExtPtr, const CreateObjectInfo* const cobPtr);
 #endif
 	~Extension();
+
+	// ======================================
+	// Extension data
+	// ======================================
 
 	// To add items to the Fusion Debugger, just uncomment this line.
 	DarkEdif::FusionDebugger FusionDebugger;
 	// After enabling it, you run FusionDebugger.AddItemToDebugger() inside Extension's constructor
 	// As an example:
 	std::tstring exampleDebuggerTextItem;
+
 
 	/*  Add any data you want to store in your extension to this class
 		(eg. what you'd normally store in rdPtr in old SDKs).
@@ -58,10 +66,11 @@ public:
 	bool HoriScrolling;
 	bool VertScrolling;
 	bool Peytonphile;
+	bool PeytonphileToEdges;
 	bool HoriFlipped;
 	bool VertFlipped;
 
-#if __ANDROID__
+#if defined(__ANDROID__) || defined(__APPLE__)
 	bool IgnoreLast;
 #endif
 
@@ -77,7 +86,7 @@ public:
 	float _xSpeed;
 	float _ySpeed;
 
-	bool _dontScroll;
+	bool DontScroll;
 
 	int GetFrameRight();
 	int GetFrameLeft();
@@ -97,9 +106,10 @@ public:
 	int GetVirtualWidth();
 	int GetVirtualHeight();
 
-#if __ANDROID__
+#if defined(__ANDROID__) || defined(__APPLE__)
 	bool IsTapped();
 #endif
+
 
 	/*  Add your actions, conditions and expressions as real class member
 		functions here. The arguments (and return type for expressions) must
@@ -111,69 +121,77 @@ public:
 
 	/// Actions
 
-		void SetDivisor(float divisor);
-		void SetMargin(float margin);
-		void SetFactor(float factor);
+	void SetDivisor(float divisor);
+	void SetMargin(float margin);
+	void SetFactor(float factor);
 
-		void SetDisallowScrolling(int setting);
-		void SetCenterDisplay(int setting);
-		void SetEasing(int setting);
-		void SetHoriScrolling(int setting);
-		void SetVertScrolling(int setting);
-		void SetPeytonphile(int setting);
+	void SetDisallowScrolling(int setting);
+	void SetCenterDisplay(int setting);
+	void SetEasing(int setting);
+	void SetHoriScrolling(int setting);
+	void SetVertScrolling(int setting);
+	void SetPeytonphile(int setting);
 
-		void SetCameraPosX(float cameraX);
-		void SetCameraPosY(float cameraY);
-		void SetCameraTargetX(float cameraX);
-		void SetCameraTargetY(float cameraY);
+	void SetCameraPosX(float cameraX);
+	void SetCameraPosY(float cameraY);
+	void SetCameraTargetX(float cameraX);
+	void SetCameraTargetY(float cameraY);
 
-		void FlipHorizontally();
-		void FlipVertically();
+	void FlipHorizontally();
+	void FlipVertically();
 
 	/// Conditions
 
-		bool CheckDisallowScrolling();
-		bool CheckCenterDisplay();
-		bool CheckEasing();
-		bool CheckHoriScrolling();
-		bool CheckVertScrolling();
-		bool CheckPeytonphile();
+	bool CheckDisallowScrolling();
+	bool CheckCenterDisplay();
+	bool CheckEasing();
+	bool CheckHoriScrolling();
+	bool CheckVertScrolling();
+	bool CheckPeytonphile();
 
-		bool CheckHoriFlipped();
-		bool CheckVertFlipped();
+	bool CheckHoriFlipped();
+	bool CheckVertFlipped();
 
 	/// Expressions
 
-		float GetDivisor();
-		float GetMargin();
-		float GetFactor();
+	float GetDivisor();
+	float GetMargin();
+	float GetFactor();
 
-		float GetXScroll();
-		float GetYScroll();
-		float GetXScrollTarget();
-		float GetYScrollTarget();
-		float GetXSpeed();
-		float GetYSpeed();
+	float GetXScroll();
+	float GetYScroll();
+	float GetXScrollTarget();
+	float GetYScrollTarget();
+	float GetXSpeed();
+	float GetYSpeed();
 
+	// Runs every tick of Fusion's runtime, can be toggled off and back on
+	REFLAG Handle();
 
+#if TEXT_OEFLAG_EXTENSION
+	// Extension text struct. Required for text exts.
+	DarkEdif::FontInfoMultiPlat font;
+	void OnFontChanged(bool colorEdit, DarkEdif::Rect* rc);
+#endif
+#if DARKEDIF_DISPLAY_TYPE == DARKEDIF_DISPLAY_SIMPLE
+	// Extension display surface ptr. Required for simple display exts.
+	DarkEdif::Surface * surf = nullptr;
+#elif DARKEDIF_DISPLAY_TYPE == DARKEDIF_DISPLAY_MANUAL
+	void Display();
+	void GetZoneInfos();
+	DarkEdif::Surface * GetDisplaySurface();
+	DarkEdif::CollisionMask * GetCollisionMask(std::uint32_t flags);
+#endif
 
-	/* These are called if there's no function linked to an ID */
-
+	// These are called if there's no function linked to an ID
 	void UnlinkedAction(int ID);
 	long UnlinkedCondition(int ID);
 	long UnlinkedExpression(int ID);
 
-
-
-
-	/*  These replace the functions like HandleRunObject that used to be
-		implemented in Runtime.cpp. They work exactly the same, but they're
-		inside the extension class.
-	*/
-
-	REFLAG Handle();
-	REFLAG Display();
-
-	short FusionRuntimePaused();
-	short FusionRuntimeContinued();
+#if PAUSABLE_EXTENSION
+	// Called when Fusion runtime is pausing - not just the F3 pause dialog
+	void FusionRuntimePaused();
+	// Called when Fusion runtime is resuming after a pause
+	void FusionRuntimeContinued();
+#endif // PAUSABLE_EXTENSION
 };

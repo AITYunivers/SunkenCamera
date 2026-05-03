@@ -17,7 +17,7 @@ void Extension::SetFactor(float factor)
 
 void Extension::SetDisallowScrolling(int setting)
 {
-	_dontScroll = setting != 0;
+	DontScroll = setting != 0;
 }
 
 void Extension::SetCenterDisplay(int setting)

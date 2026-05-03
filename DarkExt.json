@@ -5,7 +5,7 @@
 		"About": {
 			"Name": "Sunken Camera",
 			"Author": "Sunken Studios and Yunivers",
-			"Copyright": "Copyright \u00A9 2024 Yunivers",
+			"Copyright": "Copyright \u00A9 2026 Yunivers",
 			"Comment": "Version 1.0.9"
 		},
 		"ActionMenu": [
@@ -242,6 +242,12 @@
 				"Maximum": 100
 			},
 			{
+				"Title": "Disallow Scrolling at Start",
+				"Info": "If enabled, the camera will start off with scrolling being disabled.",
+				"Type": "Checkbox",
+				"DefaultState": false
+			},
+			{
 				"Title": "Auto Center Display",
 				"Info": "Automatically centers the frame to the camera.",
 				"Type": "Checkbox",
@@ -270,6 +276,12 @@
 				"Info": "Frame centered based on your cursor position scaled to the frame size.",
 				"Type": "Checkbox",
 				"DefaultState": false
+			},
+			{
+				"Title": "Peytonphile Scrolling to Edges",
+				"Info": "Allows the Peytonphile Scrolling to go to the edges, regardless of the Margin.",
+				"Type": "Checkbox",
+				"DefaultState": true
 			},
 			{
 				"Title": "Input Flipped Horizontally",

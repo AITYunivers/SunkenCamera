@@ -2,7 +2,7 @@
 
 bool Extension::CheckDisallowScrolling()
 {
-	return _dontScroll;
+	return DontScroll;
 }
 
 bool Extension::CheckCenterDisplay()
