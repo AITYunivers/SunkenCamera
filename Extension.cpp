@@ -33,6 +33,7 @@ Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr, const 
 	LinkAction(5, SetHoriScrolling);
 	LinkAction(6, SetVertScrolling);
 	LinkAction(7, SetPeytonphile);
+	LinkAction(15, SetPeytonphileToEdges);
 
 	LinkAction(9, SetCameraPosX);
 	LinkAction(10, SetCameraPosY);
@@ -49,6 +50,7 @@ Extension::Extension(const EDITDATA* const edPtr, void* const objCExtPtr, const 
 	LinkCondition(2, CheckHoriScrolling);
 	LinkCondition(3, CheckVertScrolling);
 	LinkCondition(4, CheckPeytonphile);
+	LinkCondition(8, CheckPeytonphileToEdges);
 	LinkCondition(6, CheckHoriFlipped);
 	LinkCondition(7, CheckVertFlipped);
 

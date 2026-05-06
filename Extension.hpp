@@ -131,6 +131,7 @@ public:
 	void SetHoriScrolling(int setting);
 	void SetVertScrolling(int setting);
 	void SetPeytonphile(int setting);
+	void SetPeytonphileToEdges(int setting);
 
 	void SetCameraPosX(float cameraX);
 	void SetCameraPosY(float cameraY);
@@ -148,6 +149,7 @@ public:
 	bool CheckHoriScrolling();
 	bool CheckVertScrolling();
 	bool CheckPeytonphile();
+	bool CheckPeytonphileToEdges();
 
 	bool CheckHoriFlipped();
 	bool CheckVertFlipped();

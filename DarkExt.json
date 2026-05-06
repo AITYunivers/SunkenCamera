@@ -19,6 +19,7 @@
 			[ 5, "Set Horizontal Scrolling" ],
 			[ 6, "Set Vertical Scrolling" ],
 			[ 7, "Set Peytonphile Scrolling" ],
+			[ 15, "Set Peytonphile Scrolling to Edges" ],
 			"---",
 			[
 				"Set Camera Position",
@@ -41,6 +42,7 @@
 			[ 2, "Horizontal Scrolling is enabled" ],
 			[ 3, "Vertical Scrolling is enabled" ],
 			[ 4, "Peytonphile Scrolling is enabled" ],
+			[ 8, "Peytonphile Scrolling to Edges is enabled" ],
 			"---",
 			[
 				"Input is flipped",
@@ -144,6 +146,12 @@
 			},
 			{
 				"Title": "Flip Input Vertically"
+			},
+			{
+				"Title": "Set Peytonphile Scrolling to Edges to %0",
+				"Parameters": [
+					[ "Integer", "Enter value (0 = OFF, otherwise ON)" ]
+				]
 			}
 		],
 		"Conditions": [
@@ -164,7 +172,7 @@
 				"Triggered": false
 			},
 			{
-				"Title": "%o : Is Peytonphile scrolling Enabled?",
+				"Title": "%o : Is Peytonphile Scrolling Enabled?",
 				"Triggered": false
 			},
 			{
@@ -177,6 +185,10 @@
 			},
 			{
 				"Title": "%o : Is Input Flipped Vertically?",
+				"Triggered": false
+			},
+			{
+				"Title": "%o : Is Peytonphile Scrolling to Edges Enabled?",
 				"Triggered": false
 			}
 		],

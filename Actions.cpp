@@ -45,6 +45,11 @@ void Extension::SetPeytonphile(int setting)
 	Peytonphile = setting != 0;
 }
 
+void Extension::SetPeytonphileToEdges(int setting)
+{
+	PeytonphileToEdges = setting != 0;
+}
+
 void Extension::SetCameraPosX(float cameraX)
 {
 	_scrollingX = cameraX;

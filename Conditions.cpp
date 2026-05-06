@@ -30,6 +30,11 @@ bool Extension::CheckPeytonphile()
 	return Peytonphile;
 }
 
+bool Extension::CheckPeytonphileToEdges()
+{
+	return PeytonphileToEdges;
+}
+
 bool Extension::CheckHoriFlipped()
 {
 	return HoriFlipped;
