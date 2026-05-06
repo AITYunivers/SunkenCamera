@@ -490,7 +490,7 @@ function CRunSunkenCamera() {
 	// We need this[] and globalThis[] instead of direct because HTML5 Final Project minifies and breaks the names otherwise
 	this['ExtensionVersion'] = 4; // To match C++ version
 	this['SDKVersion'] = 20; // To match C++ version
-	this['DebugMode'] = true;
+	this['DebugMode'] = false;
 	this['ExtensionName'] = 'SunkenCamera';
 
 	// Can't find DarkEdif wrapper
@@ -781,7 +781,7 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 			if (!this.dontScroll && this.horiScrolling)
 				this.scrollingXTarget = this.clamp((eWidth / 2) + (((mX - (mWidth / 2))) * ((eWidth - (this.resX + 0.0)) / mWidth)), (this.resX / 2), eWidth - (this.resX / 2)) + (this.peytonphileToEdges ? 0 : this.margin);
 
-			if (!this.dontScroll && this.VertScrolling)
+			if (!this.dontScroll && this.vertScrolling)
 				this.scrollingYTarget = this.clamp((eHeight / 2) + (((mY - (mHeight / 2))) * ((eHeight - (this.resY + 0.0)) / mHeight)), (this.resY / 2), eHeight - (this.resY / 2)) + (this.peytonphileToEdges ? 0 : this.margin);
 		}
 
