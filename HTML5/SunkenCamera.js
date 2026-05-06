@@ -488,7 +488,7 @@ function CRunSunkenCamera() {
 
 	// DarkEdif SDK exts should have these four variables defined.
 	// We need this[] and globalThis[] instead of direct because HTML5 Final Project minifies and breaks the names otherwise
-	this['ExtensionVersion'] = 1; // To match C++ version
+	this['ExtensionVersion'] = 4; // To match C++ version
 	this['SDKVersion'] = 20; // To match C++ version
 	this['DebugMode'] = true;
 	this['ExtensionName'] = 'SunkenCamera';
@@ -502,29 +502,117 @@ function CRunSunkenCamera() {
 	// ======================================================================================================
 	// Actions
 	// ======================================================================================================
-	this.Action_ActionExample = function (ExampleParameter) {
-		// nothing, as C++ does nothing
+	this.ACT_SetDivisor = function (divisor) {
+		this.divisor = divisor;
 	};
-	this.Action_SecondActionExample = function () {
-		// nothing, as C++ does nothing
+	this.ACT_SetMargin = function (margin) {
+		this.margin = margin;
+	};
+	this.ACT_SetFactor = function (factor) {
+		this.factor = this.clamp(factor, 0, 100);
+	};
+	this.ACT_SetDisallowScrolling = function (setting) {
+		this.dontScroll = setting != 0;
+	};
+	this.ACT_SetCenterDisplay = function (setting) {
+		this.centerDisplay = setting != 0;
+	};
+	this.ACT_SetHoriScrolling = function (setting) {
+		this.horiScrolling = setting != 0;
+	};
+	this.ACT_SetVertScrolling = function (setting) {
+		this.vertScrolling = setting != 0;
+	};
+	this.ACT_SetEasing = function (setting) {
+		this.easing = setting != 0;
+	};
+	this.ACT_SetPeytonphile = function (setting) {
+		this.peytonphile = setting != 0;
+	};
+	this.ACT_SetPeytonphileToEdges = function (setting) {
+		this.peytonphileToEdges = setting != 0;
+	};
+	this.ACT_SetCameraPosX = function (cameraX) {
+		this.scrollingX = cameraX;
+		this.scrollingXTarget = cameraX;
+	};
+	this.ACT_SetCameraPosY = function (cameraY) {
+		this.scrollingY = cameraY;
+		this.scrollingYTarget = cameraY;
+	};
+	this.ACT_SetCameraTargetX = function (cameraX) {
+		this.scrollingXTarget = cameraX;
+	};
+	this.ACT_SetCameraTargetY = function (cameraY) {
+		this.scrollingYTarget = cameraY;
+	};
+	this.ACT_FlipHorizontally = function () {
+		this.horiFlipped = !this.horiFlipped;
+	};
+	this.ACT_FlipVertically = function () {
+		this.vertFlipped = !this.vertFlipped;
 	};
 
 	// ======================================================================================================
 	// Conditions
 	// ======================================================================================================
-	this.Condition_AreTwoNumbersEqual = function (First, Second) {
-		return First == Second;
+	this.CND_CheckDisallowScrolling = function () {
+		return this.dontScroll;
+	};
+	this.CND_CheckCenterDisplay = function () {
+		return this.centerDisplay;
+	};
+	this.CND_CheckEasing = function () {
+		return this.easing;
+	};
+	this.CND_CheckHoriScrolling = function () {
+		return this.horiScrolling;
+	};
+	this.CND_CheckVertScrolling = function () {
+		return this.vertScrolling;
+	};
+	this.CND_CheckPeytonphile = function () {
+		return this.peytonphile;
+	};
+	this.CND_CheckPeytonphileToEdges = function () {
+		return this.peytonphileToEdges;
+	};
+	this.CND_CheckHoriFlipped = function () {
+		return this.horiFlipped;
+	};
+	this.CND_CheckVertFlipped = function () {
+		return this.vertFlipped;
 	};
 
 	// =============================
 	// Expressions
 	// =============================
-
-	this.Expression_Add = function (First, Second) {
-		return First + Second;
+	this.EXP_GetDivisor = function () {
+		return this.divisor;
 	};
-	this.Expression_HelloWorld = function () {
-		return "Hello world!";
+	this.EXP_GetMargin = function () {
+		return this.margin;
+	};
+	this.EXP_GetFactor = function () {
+		return this.factor;
+	};
+	this.EXP_GetXScroll = function () {
+		return this.scrollingX;
+	};
+	this.EXP_GetYScroll = function () {
+		return this.scrollingY;
+	};
+	this.EXP_GetXScrollTarget = function () {
+		return this.scrollingXTarget;
+	};
+	this.EXP_GetYScrollTarget = function () {
+		return this.scrollingYTarget;
+	};
+	this.EXP_GetXSpeed = function () {
+		return this.xSpeed;
+	};
+	this.EXP_GetYSpeed = function () {
+		return this.ySpeed;
 	};
 
 	// =============================
@@ -532,17 +620,44 @@ function CRunSunkenCamera() {
 	// =============================
 
 	this.$actionFuncs = [
-	/* 0 */ this.Action_ActionExample,
-	/* 1 */ this.Action_SecondActionExample
+	/* 0 */ this.ACT_SetDivisor,
+	/* 1 */ this.ACT_SetMargin,
+	/* 2 */ this.ACT_SetFactor,
+	/* 3 */ this.ACT_SetDisallowScrolling,
+	/* 4 */ this.ACT_SetEasing,
+	/* 5 */ this.ACT_SetHoriScrolling,
+	/* 6 */ this.ACT_SetVertScrolling,
+	/* 7 */ this.ACT_SetPeytonphile,
+	/* 8 */ this.ACT_SetCenterDisplay,
+	/* 9 */ this.ACT_SetCameraPosX,
+	/* 10 */ this.ACT_SetCameraPosY,
+	/* 11 */ this.ACT_SetCameraTargetX,
+	/* 12 */ this.ACT_SetCameraTargetY,
+	/* 13 */ this.ACT_FlipHorizontally,
+	/* 14 */ this.ACT_FlipVertically,
+	/* 15 */ this.ACT_SetPeytonphileToEdges
 	];
 	this.$conditionFuncs = [
-	/* 0 */ this.Condition_AreTwoNumbersEqual
-
-	// update getNumOfConditions function if you edit this!!!!
+	/* 0 */ this.CND_CheckDisallowScrolling,
+	/* 1 */ this.CND_CheckEasing,
+	/* 2 */ this.CND_CheckHoriScrolling,
+	/* 3 */ this.CND_CheckVertScrolling,
+	/* 4 */ this.CND_CheckPeytonphile,
+	/* 5 */ this.CND_CheckCenterDisplay,
+	/* 6 */ this.CND_CheckHoriFlipped,
+	/* 7 */ this.CND_CheckVertFlipped,
+	/* 8 */ this.CND_CheckPeytonphileToEdges
 	];
 	this.$expressionFuncs = [
-	/* 0 */ this.Expression_Add,
-	/* 1 */ this.Expression_HelloWorld
+	/* 0 */ this.EXP_GetDivisor,
+	/* 1 */ this.EXP_GetMargin,
+	/* 2 */ this.EXP_GetFactor,
+	/* 3 */ this.EXP_GetXScroll,
+	/* 4 */ this.EXP_GetYScroll,
+	/* 5 */ this.EXP_GetXScrollTarget,
+	/* 6 */ this.EXP_GetYScrollTarget,
+	/* 7 */ this.EXP_GetXSpeed,
+	/* 8 */ this.EXP_GetYSpeed
 	];
 }
 //
@@ -557,7 +672,7 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 	getNumberOfConditions: function() {
 		/// <summary> Returns the number of conditions </summary>
 		/// <returns type="Number" isInteger="true"> Warning, if this number is not correct, the application _will_ crash</returns>
-		return 1; // $conditionFuncs not available yet
+		return 9; // $conditionFuncs not available yet
 	},
 
 	createRunObject: function(file, cob, version) {
@@ -577,33 +692,43 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 			throw "HeaderObject not defined when needed to be.";
 		}
 		
-		const origPtr = file.pointer;
-		
-		// If you want to read between eHeader and privateData, do it here
-		
-		file.pointer = origPtr;
-		
 		// DarkEdif properties are accessible as on other platforms: IsPropChecked(), GetPropertyStr(), GetPropertyNum()
 		let props = new darkEdif['Properties'](this, file, version);
 
-		let str = "";
-		str += "Looping set Fred:\n";
-		for (let it of props.LoopPropSet("Fred")) {
-			str += "Set entry \"" + props.GetPropertyStr("Set name")
-				+ "\" has fruit \"" + props.GetPropertyStr("This set's fruit") + "\".\n";
-		}
-		str += "And agaiN!\n";
-		for (let it2 of props.LoopPropSet("Fred")) {
-			str += "Set entry \"" + props.GetPropertyStr("Set name")
-				+ "\" has fruit \"" + props.GetPropertyStr("This set's fruit") + "\".\n";
-		}
-		darkEdif.consoleLog(this, "DarkEdif prop notif:\n" + str + "========\n");
+		this.divisor = props['GetPropertyNum'](0);
+		this.margin = props['GetPropertyNum'](1);
+		this.factor = this.clamp(props['GetPropertyNum'](2), 0, 100);
 
-		this.checkboxWithinFolder = props['IsPropChecked']("Checkbox within folder");
-		//this.editable6Text = props['GetPropertyStr']("Editable 6");
-		this.surf = new darkEdif['Surface'](this.rh, true, true, 32, 32, true);
-		this.surf['SetAsExtensionDisplay'](this);
+		this.dontScroll = props['IsPropChecked'](3);
+		this.centerDisplay = props['IsPropChecked'](4);
+		this.easing = props['IsPropChecked'](5);
+		this.horiScrolling = props['IsPropChecked'](6);
+		this.vertScrolling = props['IsPropChecked'](7);
+		this.peytonphile = props['IsPropChecked'](8);
+		this.peytonphileToEdges = props['IsPropChecked'](9);
+		
+		this.horiFlipped = props['IsPropChecked'](10);
+		this.vertFlipped = props['IsPropChecked'](11);
 
+		this.marginMiddleX = 0;
+		this.marginMiddleY = 0;
+		this.dt = 0;
+		this.xSpeed = 0;
+		this.ySpeed = 0;
+
+		this.resX = this.getFrameRight() - this.getFrameLeft();
+		this.resY = this.getFrameBottom() - this.getFrameTop();
+
+		this.scrollingX = this.getVirtualWidth() / 2;
+		this.scrollingXTarget = this.scrollingX;
+		if (this.centerDisplay)
+			this.setFrameCenterX(this.scrollingX);
+
+		this.scrollingY = this.getVirtualHeight() / 2;
+		this.scrollingYTarget = this.scrollingY;
+		if (this.centerDisplay)
+			this.setFrameCenterY(this.scrollingY);
+		
 		// The return value is not used in this version of the runtime: always return false.
 		return false;
 	},
@@ -616,22 +741,79 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 		/// CRunExtension.REFLAG_ONESHOT : this function will not be called anymore,
 		///								   unless this.reHandle() is called. </returns>
 		
-		const colors = [
-			darkEdif['ColorRGB'](128, 0, 0), darkEdif['ColorRGB'](168, 157, 50),
-			darkEdif['ColorRGB'](50, 168, 64), darkEdif['ColorRGB'](50, 54, 168)
-		];
-		if (this.nextTick == null) {
-			this.nextTick = Date.now() + 200;
-			this.i = 0;
+		this.resX = this.getFrameRight() - this.getFrameLeft();
+		this.resY = this.getFrameBottom() - this.getFrameTop();
+
+		this.dt = this.getDelta();
+
+		if (!this.peytonphile)
+		{
+			this.marginMiddleX = this.clamp(this.clamp(this.getMouseX(), this.getFrameLeft(), this.getFrameRight()) - this.getFrameLeft(), ((this.resX / 2) - (this.margin / 2)), ((this.resX / 2) + (this.margin / 2)));
+			this.marginMiddleY = this.clamp(this.clamp(this.getMouseY(), this.getFrameTop(), this.getFrameBottom()) - this.getFrameTop(), ((this.resY / 2) - (this.margin / 2)), ((this.resY / 2) + (this.margin / 2)));
+			this.xSpeed = 0;
+			this.ySpeed = 0;
 		}
-		if (this.nextTick < Date.now()) {
-			this.nextTick = Date.now() + 200;
-			if (++this.i > colors.length)
-				this.i = 0;
-			this.surf['FillImageWith'](darkEdif['SurfaceFill']['Solid'](colors[this.i]));
+
+		if (!this.dontScroll && this.horiScrolling && !this.peytonphile)
+		{
+			this.xSpeed = ((this.clamp(this.getMouseX(), this.getFrameLeft(), this.getFrameRight()) - this.getFrameLeft()) - this.marginMiddleX) / this.divisor;
+			this.scrollingXTarget = this.clamp((this.scrollingXTarget + (this.xSpeed * this.dt)), (this.resX / 2), (this.getVirtualWidth() - (this.resX / 2)));
+		}
+
+		if (!this.dontScroll && this.vertScrolling && !this.peytonphile)
+		{
+			this.ySpeed = ((this.clamp(this.getMouseY(), this.getFrameTop(), this.getFrameBottom()) - this.getFrameTop()) - this.marginMiddleY) / this.divisor;
+			this.scrollingYTarget = this.clamp((this.scrollingYTarget + (this.ySpeed * this.dt)), (this.resY / 2), (this.getVirtualHeight() - (this.resY / 2)));
+		}
+
+		if (this.peytonphile)
+		{
+			this.xSpeed = 0;
+			this.ySpeed = 0;
+
+			let mX = this.getMouseX() - this.margin;
+			let mY = this.getMouseY() - this.margin;
+			let mWidth = this.getVirtualWidth() - this.margin * 2;
+			let mHeight = this.getVirtualHeight() - this.margin * 2;
+			let eWidth = this.peytonphileToEdges ? this.getVirtualWidth() : mWidth;
+			let eHeight = this.peytonphileToEdges ? this.getVirtualHeight() : mHeight;
+
+			if (!this.dontScroll && this.horiScrolling)
+				this.scrollingXTarget = this.clamp((eWidth / 2) + (((mX - (mWidth / 2))) * ((eWidth - (this.resX + 0.0)) / mWidth)), (this.resX / 2), eWidth - (this.resX / 2)) + (this.peytonphileToEdges ? 0 : this.margin);
+
+			if (!this.dontScroll && this.VertScrolling)
+				this.scrollingYTarget = this.clamp((eHeight / 2) + (((mY - (mHeight / 2))) * ((eHeight - (this.resY + 0.0)) / mHeight)), (this.resY / 2), eHeight - (this.resY / 2)) + (this.peytonphileToEdges ? 0 : this.margin);
+		}
+
+		if (!this.easing && this.horiScrolling)
+		{
+			this.scrollingX = this.scrollingXTarget;
+			if (this.centerDisplay)
+				this.setFrameCenterX(this.scrollingX);
+		}
+
+		if (!this.easing && this.vertScrolling)
+		{
+			this.scrollingY = this.scrollingYTarget;
+			if (this.centerDisplay)
+				this.setFrameCenterY(this.scrollingY);
+		}
+
+		if (this.easing && this.horiScrolling)
+		{
+			this.scrollingX = this.scrollingX + (this.scrollingXTarget - this.scrollingX) * this.clamp((this.factor / 100.0) * this.dt, 0.0, 1.0);
+			if (this.centerDisplay)
+				this.setFrameCenterX(this.scrollingX);
 		}
 		
-		return this.surf['GetAndResetAltered']() ? CRunExtension.REFLAG_DISPLAY : 0;
+		if (this.easing && this.vertScrolling)
+		{
+			this.scrollingY = this.scrollingY + (this.scrollingYTarget - this.scrollingY) * this.clamp((this.factor / 100.0) * this.dt, 0.0, 1.0);
+			if (this.centerDisplay)
+				this.setFrameCenterY(this.scrollingY);
+		}
+
+		return 0;
 	},
 	displayRunObject: function (renderer, xDraw, yDraw) {
 		this.surf.BlitToFrameWithExtEffects(renderer);
@@ -699,8 +881,78 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 		}
 
 		return func.apply(this, args);
+	},
+	getFrameRight: function() {
+		let r = this.rh.rhWindowX;
+		if ((this.rh.rh3Scrolling & CRun.RH3SCROLLING_SCROLL) != 0)
+			r = this.rh.rh3DisplayX;
+		r += this.rh.rh3WindowSx;
+		if (r > this.rh.rhLevelSx)
+			r = this.rh.rhLevelSx;
+		return r;
+	},
+	getFrameLeft: function() {
+		let r = this.rh.rhWindowX;
+		if ((this.rh.rh3Scrolling & CRun.RH3SCROLLING_SCROLL) != 0)
+			r = this.rh.rh3DisplayX;
+		if (r < 0)
+			r = 0;
+		return r;
+	},
+	getFrameBottom: function() {
+		let r = this.rh.rhWindowY;
+		if ((this.rh.rh3Scrolling & CRun.RH3SCROLLING_SCROLL) != 0)
+			r = this.rh.rh3DisplayY;
+		r += this.rh.rh3WindowSy;
+		if (r > this.rh.rhLevelSy)
+			r = this.rh.rhLevelSy;
+		return r;
+	},
+	getFrameTop: function() {
+		let r = this.rh.rhWindowY;
+		if ((this.rh.rh3Scrolling & CRun.RH3SCROLLING_SCROLL) != 0)
+			r = this.rh.rh3DisplayY;
+		if (r < 0)
+			r = 0;
+		return r;
+	},
+	setFrameCenterX: function(centerX) {
+		//centerX = this.clamp(centerX - this.rh.rh3WindowSx / 2, 0, this.getVirtualWidth() - this.rh.rh3WindowSx);
+		this.rh.setDisplay(centerX, 0, -1, 1);
+		// Redisplay?
+	},
+	setFrameCenterY: function(centerY) {
+		//centerY = this.clamp(centerY - this.rh.rh3WindowSy / 2, 0, this.getVirtualHeight() - this.rh.rh3WindowSy);
+		this.rh.setDisplay(0, centerY, -1, 2);
+		// Redisplay?
+	},
+	clamp: function(value, min, max) {
+		if (value < min)
+			return min;
+		if (value > max)
+			return max;
+		return value;
+	},
+	getMouseX: function() {
+		if (this.horiFlipped)
+			return (this.resX - this.rh.rhApp.mouseX) + this.rh.rhWindowX - this.rh.rhApp.xOffset
+		return this.rh.getXMouse();
+	},
+	getMouseY: function() {
+		if (this.vertFlipped)
+			return (this.resY - this.rh.rhApp.mouseY) + this.rh.rhWindowY - this.rh.rhApp.yOffset
+		return this.rh.getYMouse();
+	},
+	getDelta: function()
+	{
+		return this.rh.rh4MvtTimerCoef;
+	},
+	getVirtualWidth: function()
+	{
+		return this.rh.rhFrame.leVirtualRect.right;
+	},
+	getVirtualHeight: function()
+	{
+		return this.rh.rhFrame.leVirtualRect.bottom;
 	}
-
-	// No comma for the last function : the Google compiler
-	// we use for final projects does not accept it
 });
