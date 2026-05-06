@@ -816,7 +816,7 @@ CRunSunkenCamera.prototype = CServices.extend(new CRunExtension(), {
 		return 0;
 	},
 	displayRunObject: function (renderer, xDraw, yDraw) {
-		this.surf.BlitToFrameWithExtEffects(renderer);
+		
 	},
 
 	condition: function(num, cnd) {
