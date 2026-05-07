@@ -661,7 +661,7 @@ public class CRunSunkenCamera extends CRunExtension
     {
         if (VertFlipped)
         {
-            int rh2MouseY = (int)ResX - rh.rhApp.mouseY;
+            int rh2MouseY = (int)ResY - rh.rhApp.mouseY;
             if ((rh.rhGameFlags & CRun.GAMEFLAGS_REALGAME) != 0 && (rh.rhApp.gaFlags & CRunApp.GA_STRETCH) != 0)
             {
                 double yScale = (double)rh.rhFrame.leEditWinHeight / (double)rh.rhApp.syComponent;
@@ -669,7 +669,7 @@ public class CRunSunkenCamera extends CRunExtension
             }
             return rh2MouseY + rh.rhWindowY;
         }
-        return this.rh.getXMouse();
+        return this.rh.getYMouse();
     }
 
     public double GetDelta()
